@@ -95,6 +95,8 @@ export class TableFilterMenuDemo implements OnInit {
 
   allGroupsExpanded: boolean = false;
 
+  expandedAll: boolean = false;
+
   groupRowsBy: ["country.name", "representative.name"];
   multiSortMeta: [
     { field: "country.name"; order: 1 },
@@ -277,5 +279,23 @@ export class TableFilterMenuDemo implements OnInit {
   onOrderRowEditCancel(order: Order, index: number) {
     this.orders[index] = this.clonedOrders[order.id as string];
     delete this.clonedOrders[order.id as string];
+  }
+
+  private expandRecursive(node: TreeNode, isExpand: boolean) {
+    node.expanded = isExpand;
+    if (node.children) {
+      node.children.forEach((childNode) => {
+        this.expandRecursive(childNode, isExpand);
+      });
+    }
+  }
+
+  handleExpandRows() {
+    this.expandedAll = !this.expandedAll;
+    const cloneCustomers = [...this.customers];
+    cloneCustomers.forEach((node) => {
+      this.expandRecursive(node, this.expandedAll);
+    });
+    this.customers = cloneCustomers;
   }
 }

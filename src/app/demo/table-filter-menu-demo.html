@@ -18,7 +18,12 @@
       [tableStyle]="{'min-width':'100rem'}"
     >
       <ng-template pTemplate="caption">
-        <div style="text-align: left">
+        <div style="text-align: left; display: flex; gap: 8px">
+          <p-button
+            [label]="expandedAll ? 'Collapse all' : 'Expand all'"
+            styleClass="p-button-raised p-button-text"
+            (click)="handleExpandRows()"
+          />
           <p-multiSelect
             [options]="scrollableCols"
             [(ngModel)]="selectedColumns"
