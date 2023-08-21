@@ -7,7 +7,12 @@
 <div class="card">
   <p-toast></p-toast>
   <div *ngIf="selectedTable === 'customers'" [@fadeInOut]>
-    <p-treeTable [value]="customers" [columns]="cols" [scrollable]="true">
+    <p-treeTable
+      [value]="customers"
+      [columns]="cols"
+      sortMode="multiple"
+      [scrollable]="true"
+    >
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th *ngFor="let col of columns" [ttSortableColumn]="col.field">
@@ -136,12 +141,34 @@
             </p-table>
           </td>
           <ng-container *ngIf="!rowData.orders">
-            <td *ngFor="let col of columns; let i = index">
+            <td
+              *ngFor="let col of columns; let i = index"
+              [ngSwitch]="col.field"
+            >
               <p-treeTableToggler
                 [rowNode]="rowNode"
                 *ngIf="i === 0"
               ></p-treeTableToggler>
-              {{ rowData[col.field] }}
+              <!-- Name -->
+
+              <ng-container *ngSwitchCase="'name'"
+                >{{ rowData.name }}</ng-container
+              >
+              <ng-container *ngSwitchCase="'country.name'"
+                >{{ rowData.country?.name }}</ng-container
+              >
+              <!-- Agent -->
+              <ng-container *ngSwitchCase="'representative.name'"
+                >{{ rowData.representative?.name }}</ng-container
+              >
+              <!-- Date -->
+              <ng-container *ngSwitchCase="'date'"
+                >{{ rowData.date | date: 'MM/dd/yyyy' }}</ng-container
+              >
+              <!-- Balance -->
+              <ng-container *ngSwitchCase="'balance'"
+                >{{ rowData.balance | currency: 'USD':'symbol' }}</ng-container
+              >
             </td>
           </ng-container>
         </tr>
