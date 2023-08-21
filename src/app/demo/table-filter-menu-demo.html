@@ -36,8 +36,7 @@
         let-columns="columns"
       >
         <tr style="height: 57px">
-          <td *ngIf="rowData.orders" colspan="5">
-            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+          <td *ngIf="rowData.orders" colspan="4">
             <p-table [value]="rowData.orders" dataKey="id" editMode="row">
               <ng-template pTemplate="header">
                 <tr>
