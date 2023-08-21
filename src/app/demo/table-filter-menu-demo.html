@@ -9,16 +9,21 @@
   <div *ngIf="selectedTable === 'customers'" [@fadeInOut]>
     <p-treeTable
       [value]="customers"
-      [columns]="cols"
+      [columns]="scrollableCols"
       [frozenColumns]="frozenCols"
       sortMode="multiple"
       [scrollable]="true"
       frozenWidth="200px"
+      [reorderableColumns]="true"
       [tableStyle]="{'min-width':'100rem'}"
     >
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th *ngFor="let col of columns" [ttSortableColumn]="col.field">
+          <th
+            *ngFor="let col of columns"
+            [ttSortableColumn]="col.field"
+            ttReorderableColumn
+          >
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
           </th>
@@ -30,7 +35,7 @@
         let-rowData="rowData"
         let-columns="columns"
       >
-        <tr>
+        <tr style="height: 57px">
           <td *ngIf="rowData.orders" colspan="5">
             <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
             <p-table [value]="rowData.orders" dataKey="id" editMode="row">
@@ -150,7 +155,7 @@
             >
               <p-treeTableToggler
                 [rowNode]="rowNode"
-                *ngIf="i === 0"
+                *ngIf="col.field === 'name'"
               ></p-treeTableToggler>
               <!-- Name -->
 

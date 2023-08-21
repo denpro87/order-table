@@ -83,6 +83,7 @@ export class TableFilterMenuDemo implements OnInit {
 
   cols!: Column[];
   frozenCols!: Column[];
+  scrollableCols!: Column[];
 
   _selectedColumns!: Column[];
 
@@ -115,6 +116,15 @@ export class TableFilterMenuDemo implements OnInit {
       this.cols = [
         { field: "name", header: "Name" },
 
+        { field: "country.name", header: "Country" },
+
+        { field: "representative.name", header: "Agent" },
+
+        { field: "date", header: "Date" },
+
+        { field: "balance", header: "Balance" },
+      ];
+      this.scrollableCols = [
         { field: "country.name", header: "Country" },
 
         { field: "representative.name", header: "Agent" },
