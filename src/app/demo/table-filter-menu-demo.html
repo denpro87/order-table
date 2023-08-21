@@ -10,8 +10,11 @@
     <p-treeTable
       [value]="customers"
       [columns]="cols"
+      [frozenColumns]="frozenCols"
       sortMode="multiple"
       [scrollable]="true"
+      frozenWidth="200px"
+      [tableStyle]="{'min-width':'100rem'}"
     >
       <ng-template pTemplate="header" let-columns>
         <tr>

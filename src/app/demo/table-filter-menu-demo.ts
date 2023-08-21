@@ -82,6 +82,7 @@ export class TableFilterMenuDemo implements OnInit {
   activityValues: number[] = [0, 100];
 
   cols!: Column[];
+  frozenCols!: Column[];
 
   _selectedColumns!: Column[];
 
@@ -122,6 +123,7 @@ export class TableFilterMenuDemo implements OnInit {
 
         { field: "balance", header: "Balance" },
       ];
+      this.frozenCols = [{ field: "name", header: "Name" }];
 
       this._selectedColumns = this.cols;
     });
