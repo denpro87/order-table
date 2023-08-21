@@ -84,8 +84,7 @@ export class TableFilterMenuDemo implements OnInit {
   cols!: Column[];
   frozenCols!: Column[];
   scrollableCols!: Column[];
-
-  _selectedColumns!: Column[];
+  selectedColumns!: Column[];
 
   weightedMER: number = 0;
   totalAllocation: number = 0;
@@ -134,8 +133,7 @@ export class TableFilterMenuDemo implements OnInit {
         { field: "balance", header: "Balance" },
       ];
       this.frozenCols = [{ field: "name", header: "Name" }];
-
-      this._selectedColumns = this.cols;
+      this.selectedColumns = this.scrollableCols;
     });
 
     this.representatives = [
@@ -187,14 +185,6 @@ export class TableFilterMenuDemo implements OnInit {
       case "renewal":
         return null;
     }
-  }
-  @Input() get selectedColumns(): any[] {
-    return this._selectedColumns;
-  }
-
-  set selectedColumns(val: any[]) {
-    //restore original order
-    this._selectedColumns = this.cols.filter((col) => val.includes(col));
   }
 
   generateWeightedMER() {

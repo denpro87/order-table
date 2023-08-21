@@ -9,7 +9,7 @@
   <div *ngIf="selectedTable === 'customers'" [@fadeInOut]>
     <p-treeTable
       [value]="customers"
-      [columns]="scrollableCols"
+      [columns]="selectedColumns"
       [frozenColumns]="frozenCols"
       sortMode="multiple"
       [scrollable]="true"
@@ -17,6 +17,19 @@
       [reorderableColumns]="true"
       [tableStyle]="{'min-width':'100rem'}"
     >
+      <ng-template pTemplate="caption">
+        <div style="text-align: left">
+          <p-multiSelect
+            [options]="scrollableCols"
+            [(ngModel)]="selectedColumns"
+            optionLabel="header"
+            selectedItemsLabel="{0} columns selected"
+            [style]="{ width: '20em' }"
+            defaultLabel="Choose Columns"
+            display="chip"
+          ></p-multiSelect>
+        </div>
+      </ng-template>
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th
@@ -36,7 +49,7 @@
         let-columns="columns"
       >
         <tr style="height: 57px">
-          <td *ngIf="rowData.orders" colspan="4">
+          <td *ngIf="rowData.orders" [attr.colspan]="selectedColumns.length">
             <p-table [value]="rowData.orders" dataKey="id" editMode="row">
               <ng-template pTemplate="header">
                 <tr>
