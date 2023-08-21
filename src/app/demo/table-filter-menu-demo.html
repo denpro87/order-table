@@ -8,6 +8,7 @@
   <p-toast></p-toast>
   <div *ngIf="selectedTable === 'customers'" [@fadeInOut]>
     <p-treeTable
+      #tt
       [value]="customers"
       [columns]="selectedColumns"
       [frozenColumns]="frozenCols"
@@ -15,6 +16,7 @@
       [scrollable]="true"
       frozenWidth="200px"
       [reorderableColumns]="true"
+      [filterMode]="filterMode"
       [tableStyle]="{'min-width':'100rem'}"
     >
       <ng-template pTemplate="caption">
@@ -44,6 +46,15 @@
           >
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+          </th>
+        </tr>
+        <tr>
+          <th *ngFor="let col of cols">
+            <input
+              pInputText
+              type="text"
+              (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"
+            />
           </th>
         </tr>
       </ng-template>
