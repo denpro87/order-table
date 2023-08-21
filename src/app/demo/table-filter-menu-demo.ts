@@ -111,7 +111,17 @@ export class TableFilterMenuDemo implements OnInit {
       this.loading = false;
 
       this.customers = customers;
-      this.cols = [{ field: "name", header: "Name" }];
+      this.cols = [
+        { field: "name", header: "Name" },
+
+        { field: "country.name", header: "Country" },
+
+        { field: "representative.name", header: "Agent" },
+
+        { field: "date", header: "Date" },
+
+        { field: "balance", header: "Balance" },
+      ];
 
       this._selectedColumns = this.cols;
     });

@@ -23,18 +23,9 @@
         let-columns="columns"
       >
         <tr>
-          <td *ngFor="let col of columns; let i = index">
-            <p-treeTableToggler
-              [rowNode]="rowNode"
-              *ngIf="i === 0"
-            ></p-treeTableToggler>
-            {{ rowData[col.field] }}
-            <p-table
-              [value]="rowData.orders"
-              dataKey="id"
-              editMode="row"
-              *ngIf="rowData.orders"
-            >
+          <td *ngIf="rowData.orders" colspan="5">
+            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+            <p-table [value]="rowData.orders" dataKey="id" editMode="row">
               <ng-template pTemplate="header">
                 <tr>
                   <th pSortableColumn="id">
@@ -144,6 +135,15 @@
               </ng-template>
             </p-table>
           </td>
+          <ng-container *ngIf="!rowData.orders">
+            <td *ngFor="let col of columns; let i = index">
+              <p-treeTableToggler
+                [rowNode]="rowNode"
+                *ngIf="i === 0"
+              ></p-treeTableToggler>
+              {{ rowData[col.field] }}
+            </td>
+          </ng-container>
         </tr>
       </ng-template>
     </p-treeTable>
