@@ -16,7 +16,7 @@
       [scrollable]="true"
       frozenWidth="200px"
       [reorderableColumns]="true"
-      [filterMode]="filterMode"
+      filterMode="lenient"
       [tableStyle]="{'min-width':'100rem'}"
     >
       <ng-template pTemplate="caption">
@@ -35,6 +35,15 @@
             defaultLabel="Choose Columns"
             display="chip"
           ></p-multiSelect>
+          <div class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Global Search"
+              (input)="tt.filterGlobal($event.target.value, 'contains')"
+            />
+          </div>
         </div>
       </ng-template>
       <ng-template pTemplate="header" let-columns>
