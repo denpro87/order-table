@@ -7,7 +7,7 @@ import {
   animate,
 } from "@angular/animations";
 import * as FileSaver from "file-saver";
-import { MessageService, SelectItem } from "primeng/api";
+import { MessageService, TreeNode } from "primeng/api";
 
 import { Table } from "primeng/table";
 import { Customer, Order, Representative } from "../../domain/customer";
@@ -16,7 +16,6 @@ import { CustomerService } from "../../service/customerservice";
 interface Column {
   field: string;
   header: string;
-  filterType: string;
 }
 
 @Component({
@@ -41,7 +40,6 @@ export class TableFilterMenuDemo implements OnInit {
 
   tables = [
     { label: "Customers", value: "customers" },
-    { label: "Orders", value: "orders" },
     { label: "Holdings", value: "holdings" },
   ];
 
@@ -66,7 +64,7 @@ export class TableFilterMenuDemo implements OnInit {
     },
   ];
 
-  customers!: Customer[];
+  customers!: TreeNode[];
 
   orders!: Order[];
 
@@ -108,41 +106,14 @@ export class TableFilterMenuDemo implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.customerService.getCustomersMedium().then((customers) => {
+    this.customerService.getCustomerWithOrders().then((customers) => {
       // this.customers = customers;
       this.loading = false;
 
-      this.customers = customers.map((customer) => ({
-        ...customer,
-        date: new Date(customer.date),
-        groupField: `${customer.country.name} - ${customer.representative.name}`,
-      }));
-      this.customers = customers.map((customer) => ({
-        ...customer,
-        date: new Date(customer.date),
-      }));
-      this.cols = [
-        { field: "name", header: "Name", filterType: "text" },
-        { field: "country.name", header: "Country", filterType: "text" },
-        { field: "representative.name", header: "Agent", filterType: "text" },
-        { field: "date", header: "Date", filterType: "date" },
-        { field: "balance", header: "Balance", filterType: "numeric" },
-        { field: "status", header: "Status", filterType: "text" },
-        { field: "activity", header: "Activity", filterType: "text" },
-        { field: "verified", header: "Verified", filterType: "boolean" },
-      ];
+      this.customers = customers;
+      this.cols = [{ field: "name", header: "Name" }];
 
       this._selectedColumns = this.cols;
-
-      this.updateExpandedGroups();
-      this.updateExpandedKeys();
-    });
-
-    this.customerService.getCustomerWithOrders().then((customers) => {
-      this.orders = customers[0].orders.map((order) => ({
-        ...order,
-        date: new Date(order.date),
-      }));
     });
 
     this.representatives = [
@@ -268,41 +239,6 @@ export class TableFilterMenuDemo implements OnInit {
     }
   }
 
-  onRowEditCancel(customer: Customer, index: number) {
-    this.customers[index] = this.clonedCustomers[customer.id as number];
-    delete this.clonedCustomers[customer.id as number];
-  }
-
-  sortDataByCountry() {
-    // Simple sort operation based on country. Adjust as needed.
-    this.sortedCustomers = [...this.customers].sort((a, b) =>
-      a.country.name.localeCompare(b.country.name)
-    );
-  }
-
-  updateExpandedGroups() {
-    const uniqueCountries = [
-      ...new Set(this.customers.map((customer) => customer.country.name)),
-    ];
-    this.expandedGroups = uniqueCountries;
-    JSON.stringify(this.expandedGroups);
-  }
-
-  updateExpandedKeys() {
-    const uniqueCountries = [
-      ...new Set(this.customers.map((customer) => customer.country.name)),
-    ];
-
-    uniqueCountries.forEach((element, index) => {
-      const obj = {};
-      let propertyName = element;
-      obj[propertyName] = true;
-      this.expandedRowKeys.push(obj);
-    });
-
-    console.log("expandedRowKeys: " + JSON.stringify(this.expandedRowKeys));
-  }
-
   getStatusSeverity(status: string) {
     switch (status) {
       case "PENDING":
@@ -312,20 +248,6 @@ export class TableFilterMenuDemo implements OnInit {
       case "CANCELLED":
         return "danger";
     }
-  }
-
-  calculateCustomerTotal(name: string) {
-    let total = 0;
-
-    if (this.customers) {
-      for (let customer of this.customers) {
-        if (customer.representative?.name === name) {
-          total++;
-        }
-      }
-    }
-
-    return total;
   }
 
   deleteOrder(id: string) {
