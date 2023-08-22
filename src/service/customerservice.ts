@@ -3,6 +3,150 @@ import { HttpClient } from "@angular/common/http";
 
 @Injectable()
 export class CustomerService {
+
+  getCustomerAndOrdersArray() {
+    return [
+      {
+        id: 1000,
+        name: 'James Butt',
+        country: 'Algeria',
+        company: 'Benton, John B Jr',
+        date: '2015-09-13',
+        status: 'unqualified',
+        verified: true,
+        activity: 17,
+        representative: {
+          name: 'Ioni Bowcher',
+          image: 'ionibowcher.png'
+        },
+        balance: 70663,
+        orders: [
+          {
+            id: '1000-0',
+            productCode: 'f230fh0g3',
+            date: '2020-09-13',
+            amount: 65,
+            quantity: 1,
+            seller: 'David James',
+            status: 'PENDING'
+          },
+          {
+            id: '1000-1',
+            productCode: 'f230fh0g3',
+            date: '2020-05-14',
+            amount: 130,
+            quantity: 2,
+            seller: 'Leon Rodrigues',
+            status: 'DELIVERED'
+          },
+          {
+            id: '1000-2',
+            productCode: 'f230fh0g3',
+            date: '2019-01-04',
+            amount: 65,
+            quantity: 1,
+            seller: 'Juan Alejandro',
+            status: 'RETURNED'
+          },
+          {
+            id: '1000-3',
+            productCode: 'f230fh0g3',
+            date: '2020-09-13',
+            amount: 195,
+            quantity: 3,
+            seller: 'Claire Morrow',
+            status: 'CANCELLED'
+          }
+        ]
+      },
+      {
+        id: 1001,
+        name: 'Josephine Darakjy',
+        country: 'Egypt',
+        company: 'Chanay, Jeffrey A Esq',
+        date: '2019-02-09',
+        status: 'proposal',
+        verified: true,
+        activity: 0,
+        representative: {
+          name: 'Amy Elsner',
+          image: 'amyelsner.png'
+        },
+        balance: 82429,
+        orders: [
+          {
+            id: '1001-0',
+            productCode: 'nvklal433',
+            date: '2020-05-14',
+            amount: 72,
+            quantity: 1,
+            seller: 'Maisha Jefferson',
+            status: 'DELIVERED'
+          },
+          {
+            id: '1001-1',
+            productCode: 'nvklal433',
+            date: '2020-02-28',
+            amount: 144,
+            quantity: 2,
+            seller: 'Octavia Murillo',
+            status: 'PENDING'
+          }
+        ]
+      },
+      {
+        id: 1002,
+        name: 'Art Venere',
+        country: 'Panama',
+        company: 'Chemel, James L Cpa',
+        date: '2017-05-13',
+        status: 'qualified',
+        verified: false,
+        activity: 63,
+        representative: {
+          name: 'Asiya Javayant',
+          image: 'asiyajavayant.png'
+        },
+        balance: 28334,
+        orders: [
+          {
+            id: '1002-0',
+            productCode: 'zz21cz3c1',
+            date: '2020-07-05',
+            amount: 79,
+            quantity: 1,
+            seller: 'Stacey Leja',
+            status: 'DELIVERED'
+          },
+          {
+            id: '1002-1',
+            productCode: 'zz21cz3c1',
+            date: '2020-02-06',
+            amount: 79,
+            quantity: 1,
+            seller: 'Ashley Wickens',
+            status: 'DELIVERED'
+          }
+        ]
+      },
+      {
+        id: 1003,
+        name: 'Lenna Paprocki',
+        country: 'Slovenia',
+        company: 'Feltz Printing Service',
+        date: '2020-09-15',
+        status: 'new',
+        verified: false,
+        activity: 37,
+        representative: {
+          name: 'Xuxue Feng',
+          image: 'xuxuefeng.png'
+        },
+        balance: 88521,
+        orders: []
+      }
+    ]
+  }
   getCustomerAndOrders() {
     return [
       {
@@ -21,10 +165,7 @@ export class CustomerService {
                 data: {
                   id: 1001,
                   name: "James Butt",
-                  country: {
-                    name: "Algeria",
-                    code: "dz",
-                  },
+                  country: "Algeria",
                   representative: {
                     name: "Ioni Bowcher",
                     image: "ionibowcher.png",
@@ -108,10 +249,7 @@ export class CustomerService {
                 data: {
                   id: 1002,
                   name: "Josephine Darakjy",
-                  country: {
-                    name: "Algeria",
-                    code: "dz",
-                  },
+                  country: "Algeria",
                   representative: {
                     name: "Ioni Bowcher",
                     image: "ionibowcher.png",
@@ -203,10 +341,7 @@ export class CustomerService {
                 data: {
                   id: 1003,
                   name: "Donette Foller",
-                  country: {
-                    name: "Algeria",
-                    code: "dz",
-                  },
+                  country: "Algeria",
                   representative: {
                     name: "Amy Elsner",
                     image: "Amy Elsner.png",
@@ -290,10 +425,7 @@ export class CustomerService {
                 data: {
                   id: 1004,
                   name: "Art Venere",
-                  country: {
-                    name: "Algeria",
-                    code: "dz",
-                  },
+                  country: "Algeria",
                   representative: {
                     name: "Amy Elsner",
                     image: "Amy Elsner.png",
@@ -393,10 +525,7 @@ export class CustomerService {
                 data: {
                   id: 1005,
                   name: "James Butt",
-                  country: {
-                    name: "Argentina",
-                    code: "ar",
-                  },
+                  country: "Argentina",
                   representative: {
                     name: "Ioni Bowcher",
                     image: "ionibowcher.png",
@@ -480,10 +609,7 @@ export class CustomerService {
                 data: {
                   id: 1006,
                   name: "Josephine Darakjy",
-                  country: {
-                    name: "Argentina",
-                    code: "ar",
-                  },
+                  country: "Argentina",
                   representative: {
                     name: "Ioni Bowcher",
                     image: "ionibowcher.png",
@@ -575,10 +701,7 @@ export class CustomerService {
                 data: {
                   id: 1007,
                   name: "Donette Foller",
-                  country: {
-                    name: "Argentina",
-                    code: "ar",
-                  },
+                  country: "Argentina",
                   representative: {
                     name: "Amy Elsner",
                     image: "Amy Elsner.png",
@@ -662,10 +785,7 @@ export class CustomerService {
                 data: {
                   id: 1008,
                   name: "Art Venere",
-                  country: {
-                    name: "Argentina",
-                    code: "ar",
-                  },
+                  country: "Argentina",
                   representative: {
                     name: "Amy Elsner",
                     image: "Amy Elsner.png",
@@ -9781,6 +9901,10 @@ export class CustomerService {
 
   getCustomerWithOrders() {
     return Promise.resolve(this.getCustomerAndOrders());
+  }
+
+  getCustomerWithOrdersArray() {
+    return Promise.resolve(this.getCustomerAndOrdersArray());
   }
 
   getCustomers(params?: any) {

@@ -16,7 +16,14 @@ import { CustomerService } from "../../service/customerservice";
 interface Column {
   field: string;
   header: string;
+  filterType: string;
 }
+
+interface DropDownOption {
+  label: string;
+  value: string[];
+}
+
 
 @Component({
   selector: "table-filter-menu-demo",
@@ -66,6 +73,8 @@ export class TableFilterMenuDemo implements OnInit {
 
   customers!: TreeNode[];
 
+  customerArray!: Customer[];
+
   orders!: Order[];
 
   clonedOrders: { [s: string]: Order } = {};
@@ -97,11 +106,18 @@ export class TableFilterMenuDemo implements OnInit {
 
   expandedAll: boolean = false;
 
-  groupRowsBy: ["country.name", "representative.name"];
+  groupRowsBy: ["country", "representative.name"];
   multiSortMeta: [
-    { field: "country.name"; order: 1 },
+    { field: "country"; order: 1 },
     { field: "representative.name"; order: -1 }
   ];
+
+  treeTableData: any[] = [];
+  groupingOptions: any[] = [
+    { label: 'Group by Country', value: ['country'] },
+    { label: 'Group by Country & Name', value: ['country', 'name'] }
+  ];
+  selectedGrouping: DropDownOption;
 
   constructor(
     private customerService: CustomerService,
@@ -115,27 +131,35 @@ export class TableFilterMenuDemo implements OnInit {
 
       this.customers = customers;
       this.cols = [
-        { field: "name", header: "Name" },
+        { field: "name", header: "Name", filterType: 'text' },
 
-        { field: "country.name", header: "Country" },
+        { field: "country", header: "Country", filterType: 'text' },
 
-        { field: "representative.name", header: "Agent" },
+        { field: "representative.name", header: "Agent", filterType: 'text' },
 
-        { field: "date", header: "Date" },
+        { field: "date", header: "Date", filterType: 'date' },
 
-        { field: "balance", header: "Balance" },
+        { field: "balance", header: "Balance", filterType: 'numeric' },
       ];
       this.scrollableCols = [
-        { field: "country.name", header: "Country" },
+        { field: "country", header: "Country", filterType: 'date' },
 
-        { field: "representative.name", header: "Agent" },
+        { field: "representative.name", header: "Agent", filterType: 'date' },
 
-        { field: "date", header: "Date" },
+        { field: "date", header: "Date", filterType: 'numeric' },
 
-        { field: "balance", header: "Balance" },
+        { field: "balance", header: "Balance", filterType: 'numeric' },
       ];
-      this.frozenCols = [{ field: "name", header: "Name" }];
+      this.frozenCols = [{ field: "name", header: "Name", filterType: 'date' }];
       this.selectedColumns = this.scrollableCols;
+    });
+
+    this.customerService.getCustomerWithOrdersArray().then((customerArray) => {
+      this.customerArray = customerArray;
+
+      // Initialize with default grouping
+      this.selectedGrouping = this.groupingOptions[0];
+      this.updateTreeTableData();
     });
 
     this.representatives = [
@@ -160,10 +184,7 @@ export class TableFilterMenuDemo implements OnInit {
       { label: "Proposal", value: "proposal" },
     ];
 
-    // this.sortDataByCountry(); // sort data by country on initialization
 
-    // this.updateExpandedGroups();
-    // this.updateExpandedKeys();
   }
 
   clear(table: Table) {
@@ -209,7 +230,7 @@ export class TableFilterMenuDemo implements OnInit {
 
   exportExcel() {
     import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(this.customers);
+      const worksheet = xlsx.utils.json_to_sheet(this.customerArray);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer: any = xlsx.write(workbook, {
         bookType: "xlsx",
@@ -298,4 +319,53 @@ export class TableFilterMenuDemo implements OnInit {
     });
     this.customers = cloneCustomers;
   }
+
+  groupByAndSum(list: any[], keys: string[]): any[] {
+    if (keys.length === 0) {
+      const sum = list.reduce((acc, curr) => {
+        acc.total += curr.total; // Assuming 'total' is the field you want to sum
+        return acc;
+      }, { total: 0 });
+
+      return [{ data: sum, details: list }];
+    }
+
+    // Get the first key
+    const key = keys[0];
+
+    // Group by the key
+    const grouped = list.reduce((acc, curr) => {
+      (acc[curr[key]] = acc[curr[key]] || []).push(curr);
+      return acc;
+    }, {});
+
+    const nextKeys = keys.slice(1);
+
+    // For each group, call the function recursively
+    for (const prop in grouped) {
+      grouped[prop] = this.groupByAndSum(grouped[prop], nextKeys);
+    }
+
+    // Convert the grouped object into an array
+    const result = [];
+    for (const prop in grouped) {
+      const childrenTotal = grouped[prop].reduce((sum, child) => sum + child.data.total, 0);
+      result.push({
+        data: { name: prop, total: childrenTotal },
+        children: grouped[prop]
+      });
+    }
+
+    return result;
+  }
+
+  onGroupingChange(): void {
+    this.updateTreeTableData();
+  }
+
+  updateTreeTableData(): void {
+    this.treeTableData = this.groupByAndSum(this.customerArray, this.selectedGrouping.value);
+    console.log("treeTableData: " + JSON.stringify(this.treeTableData));
+  }
+
 }

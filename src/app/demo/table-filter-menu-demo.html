@@ -9,11 +9,12 @@
   <div *ngIf="selectedTable === 'customers'" [@fadeInOut]>
     <p-treeTable
       #tt
-      [value]="customers"
+      [value]="treeTableData"
       [columns]="selectedColumns"
       [frozenColumns]="frozenCols"
       sortMode="multiple"
       [scrollable]="true"
+      scrollHeight="400px"
       frozenWidth="200px"
       [reorderableColumns]="true"
       filterMode="lenient"
@@ -21,6 +22,8 @@
     >
       <ng-template pTemplate="caption">
         <div style="text-align: left; display: flex; gap: 8px">
+          <p-dropdown [options]="groupingOptions" [(ngModel)]="selectedGrouping"
+                      optionLabel="label" (onChange)="onGroupingChange()"></p-dropdown>
           <p-button
             [label]="expandedAll ? 'Collapse all' : 'Expand all'"
             styleClass="p-button-raised p-button-text"
@@ -33,7 +36,6 @@
             selectedItemsLabel="{0} columns selected"
             [style]="{ width: '20em' }"
             defaultLabel="Choose Columns"
-            display="chip"
           ></p-multiSelect>
           <div class="p-input-icon-left">
             <i class="pi pi-search"></i>
@@ -44,35 +46,25 @@
               (input)="tt.filterGlobal($event.target.value, 'contains')"
             />
           </div>
+          <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2" pTooltip="XLS" tooltipPosition="bottom"></button>
         </div>
       </ng-template>
       <ng-template pTemplate="header" let-columns>
         <tr>
-          <th
-            *ngFor="let col of columns"
-            [ttSortableColumn]="col.field"
-            ttReorderableColumn
-          >
+          <th *ngFor="let col of columns" [ttSortableColumn]="col.field" ttReorderableColumn>
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
           </th>
         </tr>
         <tr>
           <th *ngFor="let col of columns">
-            <input
-              pInputText
-              type="text"
-              (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"
-            />
+            <input *ngIf="col.filterType === 'text'" pInputText type="text" (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"/>
+            <p-calendar *ngIf="col.filterType === 'date'" [(ngModel)]="col.field" (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"></p-calendar>
+            <p-inputNumber *ngIf="col.filterType === 'numeric'" [(ngModel)]="col.field" inputId="currency-us" mode="currency" currency="USD" locale="en-US" (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"> </p-inputNumber>
           </th>
         </tr>
       </ng-template>
-      <ng-template
-        pTemplate="body"
-        let-rowNode
-        let-rowData="rowData"
-        let-columns="columns"
-      >
+      <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns">
         <tr style="height: 57px">
           <td *ngIf="rowData.orders" [attr.colspan]="selectedColumns.length">
             <p-table [value]="rowData.orders" dataKey="id" editMode="row">
@@ -93,12 +85,7 @@
                   <th style="width: 20%"></th>
                 </tr>
               </ng-template>
-              <ng-template
-                pTemplate="body"
-                let-order
-                let-editing="editing"
-                let-ri="rowIndex"
-              >
+              <ng-template pTemplate="body" let-order let-editing="editing" let-ri="rowIndex">
                 <tr [pEditableRow]="order">
                   <td>{{ order.id }}</td>
                   <td>
@@ -114,11 +101,7 @@
                   <td>
                     <p-cellEditor>
                       <ng-template pTemplate="input">
-                        <input
-                          pInputText
-                          type="text"
-                          [(ngModel)]="order.amount"
-                        />
+                        <input pInputText type="text" [(ngModel)]="order.amount"/>
                       </ng-template>
                       <ng-template pTemplate="output">
                         {{order.amount | currency: 'USD'}}
@@ -126,15 +109,10 @@
                     </p-cellEditor>
                   </td>
                   <td>
-                    <p-tag
-                      [value]="order.status"
-                      [severity]="getStatusSeverity(order.status)"
-                    ></p-tag>
+                    <p-tag [value]="order.status" [severity]="getStatusSeverity(order.status)"></p-tag>
                   </td>
                   <td>
-                    <div
-                      class="flex align-items-center justify-content-center gap-2"
-                    >
+                    <div class="flex align-items-center justify-content-center gap-2">
                       <button
                         *ngIf="!editing"
                         pButton
@@ -186,34 +164,25 @@
             </p-table>
           </td>
           <ng-container *ngIf="!rowData.orders">
-            <td
-              *ngFor="let col of columns; let i = index"
-              [ngSwitch]="col.field"
-            >
-              <p-treeTableToggler
-                [rowNode]="rowNode"
-                *ngIf="col.field === 'name'"
-              ></p-treeTableToggler>
-              <!-- Name -->
+            <td *ngFor="let col of columns; let i = index" [ngSwitch]="col.field">
+              <p-treeTableToggler [rowNode]="rowNode" *ngIf="col.field === 'name'"></p-treeTableToggler>
 
-              <ng-container *ngSwitchCase="'name'"
-                >{{ rowData.name }}</ng-container
-              >
-              <ng-container *ngSwitchCase="'country.name'"
-                >{{ rowData.country?.name }}</ng-container
-              >
+              <!-- Name -->
+              <ng-container *ngSwitchCase="'name'">{{ rowData.name }}</ng-container>
+
+              <!-- Country -->
+              <ng-container *ngSwitchCase="'country'">{{ rowData.country?.name }}</ng-container>
+
               <!-- Agent -->
-              <ng-container *ngSwitchCase="'representative.name'"
-                >{{ rowData.representative?.name }}</ng-container
-              >
+              <ng-container *ngSwitchCase="'representative.name'">{{ rowData.representative?.name }}</ng-container>
+
               <!-- Date -->
-              <ng-container *ngSwitchCase="'date'"
-                >{{ rowData.date | date: 'MM/dd/yyyy' }}</ng-container
-              >
+              <ng-container *ngSwitchCase="'date'">{{ rowData.date | date: 'MM/dd/yyyy' }}</ng-container>
+
               <!-- Balance -->
-              <ng-container *ngSwitchCase="'balance'"
-                >{{ rowData.balance | currency: 'USD':'symbol' }}</ng-container
-              >
+              <ng-container *ngSwitchCase="'balance'">
+                {{ rowData.balance | currency: 'USD':'symbol' }}
+              </ng-container>
             </td>
           </ng-container>
         </tr>
