@@ -17,8 +17,8 @@
       scrollHeight="400px"
       frozenWidth="200px"
       [reorderableColumns]="true"
-      filterMode="lenient"
-      [tableStyle]="{'min-width':'100rem'}"
+      filterMode="strict"
+      [tableStyle]="{'min-width':'80rem'}"
     >
       <ng-template pTemplate="caption">
         <div style="text-align: left; display: flex; gap: 8px">
@@ -83,12 +83,10 @@
             />
             <p-calendar
               *ngIf="col.filterType === 'date'"
-              [(ngModel)]="col.field"
               (input)="tt.filter($event.target.value, col.field, col.filterMatchMode)"
             ></p-calendar>
             <p-inputNumber
               *ngIf="col.filterType === 'numeric'"
-              [(ngModel)]="col.field"
               inputId="currency-us"
               mode="currency"
               currency="USD"

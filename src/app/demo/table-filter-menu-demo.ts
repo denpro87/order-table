@@ -124,11 +124,9 @@ export class TableFilterMenuDemo implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.customerService.getCustomerWithOrders().then((customers) => {
-      // this.customers = customers;
+    this.customerService.getCustomerWithOrdersArray().then((customerArray) => {
       this.loading = false;
-
-      // this.customers = customers;
+      this.customerArray = customerArray;
       this.cols = [
         { field: "name", header: "Name", filterType: "text" },
 
@@ -141,20 +139,16 @@ export class TableFilterMenuDemo implements OnInit {
         { field: "balance", header: "Balance", filterType: "numeric" },
       ];
       this.scrollableCols = [
-        { field: "country", header: "Country", filterType: "date" },
+        { field: "country", header: "Country", filterType: "text" },
 
-        { field: "representative.name", header: "Agent", filterType: "date" },
+        { field: "representative.name", header: "Agent", filterType: "text" },
 
-        { field: "date", header: "Date", filterType: "numeric" },
+        { field: "date", header: "Date", filterType: "date" },
 
         { field: "balance", header: "Balance", filterType: "numeric" },
       ];
-      this.frozenCols = [{ field: "name", header: "Name", filterType: "date" }];
+      this.frozenCols = [{ field: "name", header: "Name", filterType: "text" }];
       this.selectedColumns = this.scrollableCols;
-    });
-
-    this.customerService.getCustomerWithOrdersArray().then((customerArray) => {
-      this.customerArray = customerArray;
 
       // Initialize with default grouping
       this.selectedGrouping = this.groupingOptions[0];
