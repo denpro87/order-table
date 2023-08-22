@@ -24,7 +24,6 @@ interface DropDownOption {
   value: string[];
 }
 
-
 @Component({
   selector: "table-filter-menu-demo",
   templateUrl: "table-filter-menu-demo.html",
@@ -114,8 +113,8 @@ export class TableFilterMenuDemo implements OnInit {
 
   treeTableData: any[] = [];
   groupingOptions: any[] = [
-    { label: 'Group by Country', value: ['country'] },
-    { label: 'Group by Country & Name', value: ['country', 'name'] }
+    { label: "Group by Country", value: ["country"] },
+    { label: "Group by Country & Name", value: ["country", "name"] },
   ];
   selectedGrouping: DropDownOption;
 
@@ -129,28 +128,28 @@ export class TableFilterMenuDemo implements OnInit {
       // this.customers = customers;
       this.loading = false;
 
-      this.customers = customers;
+      // this.customers = customers;
       this.cols = [
-        { field: "name", header: "Name", filterType: 'text' },
+        { field: "name", header: "Name", filterType: "text" },
 
-        { field: "country", header: "Country", filterType: 'text' },
+        { field: "country", header: "Country", filterType: "text" },
 
-        { field: "representative.name", header: "Agent", filterType: 'text' },
+        { field: "representative.name", header: "Agent", filterType: "text" },
 
-        { field: "date", header: "Date", filterType: 'date' },
+        { field: "date", header: "Date", filterType: "date" },
 
-        { field: "balance", header: "Balance", filterType: 'numeric' },
+        { field: "balance", header: "Balance", filterType: "numeric" },
       ];
       this.scrollableCols = [
-        { field: "country", header: "Country", filterType: 'date' },
+        { field: "country", header: "Country", filterType: "date" },
 
-        { field: "representative.name", header: "Agent", filterType: 'date' },
+        { field: "representative.name", header: "Agent", filterType: "date" },
 
-        { field: "date", header: "Date", filterType: 'numeric' },
+        { field: "date", header: "Date", filterType: "numeric" },
 
-        { field: "balance", header: "Balance", filterType: 'numeric' },
+        { field: "balance", header: "Balance", filterType: "numeric" },
       ];
-      this.frozenCols = [{ field: "name", header: "Name", filterType: 'date' }];
+      this.frozenCols = [{ field: "name", header: "Name", filterType: "date" }];
       this.selectedColumns = this.scrollableCols;
     });
 
@@ -183,8 +182,6 @@ export class TableFilterMenuDemo implements OnInit {
       { label: "Renewal", value: "renewal" },
       { label: "Proposal", value: "proposal" },
     ];
-
-
   }
 
   clear(table: Table) {
@@ -313,59 +310,49 @@ export class TableFilterMenuDemo implements OnInit {
 
   handleExpandRows() {
     this.expandedAll = !this.expandedAll;
-    const cloneCustomers = [...this.customers];
-    cloneCustomers.forEach((node) => {
+    const cloneData = [...this.treeTableData];
+    cloneData.forEach((node) => {
       this.expandRecursive(node, this.expandedAll);
     });
-    this.customers = cloneCustomers;
-  }
-
-  groupByAndSum(list: any[], keys: string[]): any[] {
-    if (keys.length === 0) {
-      const sum = list.reduce((acc, curr) => {
-        acc.total += curr.total; // Assuming 'total' is the field you want to sum
-        return acc;
-      }, { total: 0 });
-
-      return [{ data: sum, details: list }];
-    }
-
-    // Get the first key
-    const key = keys[0];
-
-    // Group by the key
-    const grouped = list.reduce((acc, curr) => {
-      (acc[curr[key]] = acc[curr[key]] || []).push(curr);
-      return acc;
-    }, {});
-
-    const nextKeys = keys.slice(1);
-
-    // For each group, call the function recursively
-    for (const prop in grouped) {
-      grouped[prop] = this.groupByAndSum(grouped[prop], nextKeys);
-    }
-
-    // Convert the grouped object into an array
-    const result = [];
-    for (const prop in grouped) {
-      const childrenTotal = grouped[prop].reduce((sum, child) => sum + child.data.total, 0);
-      result.push({
-        data: { name: prop, total: childrenTotal },
-        children: grouped[prop]
-      });
-    }
-
-    return result;
+    this.treeTableData = cloneData;
   }
 
   onGroupingChange(): void {
     this.updateTreeTableData();
   }
 
-  updateTreeTableData(): void {
-    this.treeTableData = this.groupByAndSum(this.customerArray, this.selectedGrouping.value);
-    console.log("treeTableData: " + JSON.stringify(this.treeTableData));
+  groupingData(list, deep) {
+    const key = this.selectedGrouping.value[deep];
+    const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
+      (acc, current) => {
+        acc[current[key]] = acc[current[key]] ?? [];
+        acc[current[key]].push(current);
+        return acc;
+      },
+      {}
+    );
+    return Object.entries(groupingViaCommonProperty).map(([group, value]) => ({
+      data: {
+        name: group,
+        balance: value.reduce((accumulator, object) => {
+          return accumulator + object.balance;
+        }, 0),
+      },
+      children:
+        deep < this.selectedGrouping.value.length - 1
+          ? this.groupingData(value, deep + 1)
+          : value.map((item) => {
+              const itemData = { ...item };
+              delete itemData.orders;
+              return {
+                data: itemData,
+                children: [{ data: { orders: item["orders"] } }],
+              };
+            }),
+    }));
   }
-
+  updateTreeTableData(): void {
+    this.treeTableData = this.groupingData(this.customerArray, 0);
+    console.log("threeTableData=====>", this.treeTableData);
+  }
 }
