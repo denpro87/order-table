@@ -93,7 +93,7 @@
               mode="currency"
               currency="USD"
               locale="en-US"
-              (onInput)="tt.filter($event.value.toString(), col.field, col.filterMatchMode)"
+              (onInput)="tt.filter($event.value?.toString(), col.field, col.filterMatchMode)"
             >
             </p-inputNumber>
           </th>
