@@ -10,8 +10,10 @@ import * as FileSaver from "file-saver";
 import { MessageService, TreeNode } from "primeng/api";
 
 import { Table } from "primeng/table";
-import { Customer, Order, Representative } from "../../domain/customer";
+import { Order } from "../../domain/customer";
+import { Holding } from "../../domain/holding";
 import { CustomerService } from "../../service/customerservice";
+import { HoldingService } from "src/service/holdingService";
 
 interface Column {
   field: string;
@@ -42,22 +44,13 @@ interface DropDownOption {
   providers: [MessageService],
 })
 export class HoldingComponent implements OnInit {
-  customers!: TreeNode[];
-
-  customerArray!: Customer[];
+  holdings!: TreeNode[];
+  holdingArray!: Holding[];
 
   orders!: Order[];
-
   clonedOrders: { [s: string]: Order } = {};
-  sortedCustomers: Customer[]; // Sorted list based on country
-
-  clonedCustomers: { [s: number]: Customer } = {};
-
-  statuses!: any[];
 
   loading: boolean = true;
-
-  activityValues: number[] = [0, 100];
 
   cols!: Column[];
   frozenCols!: Column[];
@@ -72,85 +65,73 @@ export class HoldingComponent implements OnInit {
   expandedAll: boolean = false;
 
   treeTableData: any[] = [];
-  groupingOptions: any[] = [
-    { label: "Group by Country", value: ["country"] },
-    { label: "Group by Country & Name", value: ["country", "name"] },
-  ];
+  groupingOptions: any[] = [{ label: "Asset Class", value: ["assetClass"] }];
   selectedGrouping: DropDownOption;
 
   constructor(
     private customerService: CustomerService,
-    private messageService: MessageService
+    private holdingService: HoldingService
   ) {}
 
   ngOnInit() {
-    this.customerService.getCustomerWithOrdersArray().then((customerArray) => {
+    this.holdingService.getHoldingData().then((holdingArray) => {
       this.loading = false;
-      this.customerArray = customerArray;
+      this.holdingArray = holdingArray;
       this.cols = [
-        { field: "name", header: "Name", filterType: "text" },
-
-        { field: "country", header: "Country", filterType: "text" },
-
-        { field: "representative.name", header: "Agent", filterType: "text" },
-
-        { field: "date", header: "Date", filterType: "date" },
-
-        { field: "balance", header: "Balance", filterType: "numeric" },
+        { field: "holdingName", header: "Holdings", filterType: "text" },
+        { field: "holdingCode", header: "Holding Code", filterType: "text" },
+        { field: "price", header: "Price", filterType: "numeric" },
+        { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+        {
+          field: "portfolioPercent",
+          header: "% of Port",
+          filterType: "numeric",
+        },
+        {
+          field: "assetClassPercent",
+          header: "% of Class",
+          filterType: "numeric",
+        },
+        {
+          field: "portfolioManger",
+          header: "port.Manger",
+          filterType: "text",
+        },
       ];
       this.scrollableCols = [
-        { field: "country", header: "Country", filterType: "text" },
-
-        { field: "representative.name", header: "Agent", filterType: "text" },
-
-        { field: "date", header: "Date", filterType: "date" },
-
-        { field: "balance", header: "Balance", filterType: "numeric" },
+        { field: "holdingCode", header: "Holding Code", filterType: "text" },
+        { field: "price", header: "Price", filterType: "numeric" },
+        { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+        {
+          field: "portfolioPercent",
+          header: "% of Port",
+          filterType: "numeric",
+        },
+        {
+          field: "assetClassPercent",
+          header: "% of Class",
+          filterType: "numeric",
+        },
+        {
+          field: "portfolioManger",
+          header: "port.Manger",
+          filterType: "text",
+        },
       ];
-      this.frozenCols = [{ field: "name", header: "Name", filterType: "text" }];
+      this.frozenCols = [
+        { field: "holdingName", header: "Holdings", filterType: "text" },
+      ];
       this.selectedColumns = this.scrollableCols;
 
       // Initialize with default grouping
       this.selectedGrouping = this.groupingOptions[0];
       this.updateTreeTableData();
     });
-
-    this.statuses = [
-      { label: "Unqualified", value: "unqualified" },
-      { label: "Qualified", value: "qualified" },
-      { label: "New", value: "new" },
-      { label: "Negotiation", value: "negotiation" },
-      { label: "Renewal", value: "renewal" },
-      { label: "Proposal", value: "proposal" },
-    ];
-  }
-
-  clear(table: Table) {
-    table.clear();
-  }
-
-  getSeverity(status: string) {
-    switch (status.toLowerCase()) {
-      case "unqualified":
-        return "danger";
-
-      case "qualified":
-        return "success";
-
-      case "new":
-        return "info";
-
-      case "negotiation":
-        return "warning";
-
-      case "renewal":
-        return null;
-    }
   }
 
   exportExcel() {
     import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(this.customerArray);
+      const worksheet = xlsx.utils.json_to_sheet(this.holdingArray);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer: any = xlsx.write(workbook, {
         bookType: "xlsx",
@@ -235,9 +216,9 @@ export class HoldingComponent implements OnInit {
     );
     return Object.entries(groupingViaCommonProperty).map(([group, value]) => ({
       data: {
-        name: group,
-        balance: value.reduce((accumulator, object) => {
-          return accumulator + object.balance;
+        holdingName: group,
+        marketValue: value.reduce((accumulator, object) => {
+          return accumulator + Number(object.marketValue);
         }, 0),
       },
       children:
@@ -254,7 +235,7 @@ export class HoldingComponent implements OnInit {
     }));
   }
   updateTreeTableData(): void {
-    this.treeTableData = this.groupingData(this.customerArray, 0);
+    this.treeTableData = this.groupingData(this.holdingArray, 0);
     console.log("threeTableData=====>", this.treeTableData);
   }
 }

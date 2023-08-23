@@ -222,39 +222,12 @@
             </p-table>
           </td>
           <ng-container *ngIf="!rowData.orders">
-            <td
-              *ngFor="let col of columns; let i = index"
-              [ngSwitch]="col.field"
-            >
+            <td *ngFor="let col of columns; let i = index">
               <p-treeTableToggler
                 [rowNode]="rowNode"
-                *ngIf="col.field === 'name'"
+                *ngIf="col.field === 'holdingName'"
               ></p-treeTableToggler>
-
-              <!-- Name -->
-              <ng-container *ngSwitchCase="'name'">{{
-                rowData.name
-              }}</ng-container>
-
-              <!-- Country -->
-              <ng-container *ngSwitchCase="'country'">{{
-                rowData.country?.name
-              }}</ng-container>
-
-              <!-- Agent -->
-              <ng-container *ngSwitchCase="'representative.name'">{{
-                rowData.representative?.name
-              }}</ng-container>
-
-              <!-- Date -->
-              <ng-container *ngSwitchCase="'date'">{{
-                rowData.date | date : "MM/dd/yyyy"
-              }}</ng-container>
-
-              <!-- Balance -->
-              <ng-container *ngSwitchCase="'balance'">
-                {{ rowData.balance | currency : "USD" : "symbol" }}
-              </ng-container>
+              {{ rowData[col.field] }}
             </td>
           </ng-container>
         </tr>
