@@ -5,7 +5,7 @@
         <th rowData.accounts>Account Name</th>
         <th
           *ngFor="let col of accountScrollableCols"
-          [ttSortableColumn]="col.field"
+          [pSortableColumn]="col.field"
         >
           {{ col.header }}
           <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>

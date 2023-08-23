@@ -4,10 +4,12 @@
     <p-treeTable
       #tt
       [value]="treeTableData"
-      [columns]="cols"
+      [columns]="selectedColumns"
+      [frozenColumns]="frozenCols"
       sortMode="multiple"
       [scrollable]="true"
       scrollHeight="400px"
+      frozenWidth="200px"
       [reorderableColumns]="true"
       filterMode="strict"
       [tableStyle]="{ 'min-width': '80rem' }"
@@ -108,7 +110,7 @@
         let-columns="columns"
       >
         <tr *ngIf="rowData.accounts">
-          <td [attr.colspan]="cols.length">
+          <td [attr.colspan]="selectedColumns.length">
             <app-account-table [accounts]="rowData.accounts" />
           </td>
         </tr>
