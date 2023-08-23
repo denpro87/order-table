@@ -110,42 +110,38 @@
         let-columns="columns"
       >
         <tr style="height: 57px">
-          <td *ngIf="rowData.orders" [attr.colspan]="selectedColumns.length">
-            <p-table [value]="rowData.orders" dataKey="id" editMode="row">
+          <td *ngIf="rowData.accounts" [attr.colspan]="selectedColumns.length">
+            <p-table [value]="rowData.accounts" dataKey="id" editMode="row">
               <ng-template pTemplate="header">
                 <tr>
-                  <th pSortableColumn="id">
-                    Id <p-sortIcon field="price"></p-sortIcon>
-                  </th>
-                  <th pSortableColumn="date">
-                    Date <p-sortIcon field="date"></p-sortIcon>
-                  </th>
-                  <th pSortableColumn="amount">
-                    Amount <p-sortIcon field="amount"></p-sortIcon>
-                  </th>
-                  <th pSortableColumn="status">
-                    Status <p-sortIcon field="status"></p-sortIcon>
+                  <th
+                    *ngFor="let col of accountCols"
+                    [ttSortableColumn]="col.field"
+                  >
+                    {{ col.header }}
+                    <p-treeTableSortIcon
+                      [field]="col.field"
+                    ></p-treeTableSortIcon>
                   </th>
                   <th style="width: 20%"></th>
                 </tr>
               </ng-template>
               <ng-template
                 pTemplate="body"
-                let-order
+                let-account
                 let-editing="editing"
                 let-ri="rowIndex"
               >
-                <tr [pEditableRow]="order">
-                  <td>{{ order.id }}</td>
+                <tr [pEditableRow]="account">
+                  <td>{{ account.accountName }}</td>
                   <td>
-                    <p-cellEditor>
-                      <ng-template pTemplate="input">
-                        <p-calendar [(ngModel)]="order.date" />
-                      </ng-template>
-                      <ng-template pTemplate="output">
-                        {{ order.date | date : "MM/dd/yyyy" }}
-                      </ng-template>
-                    </p-cellEditor>
+                    {{ account.quantity }}
+                  </td>
+                  <td>
+                    {{ account.accountType }}
+                  </td>
+                  <td>
+                    {{ account.programType }}
                   </td>
                   <td>
                     <p-cellEditor>
@@ -153,19 +149,13 @@
                         <input
                           pInputText
                           type="text"
-                          [(ngModel)]="order.amount"
+                          [(ngModel)]="account.allocation"
                         />
                       </ng-template>
                       <ng-template pTemplate="output">
-                        {{ order.amount | currency : "USD" }}
+                        {{ account.allocation }}
                       </ng-template>
                     </p-cellEditor>
-                  </td>
-                  <td>
-                    <p-tag
-                      [value]="order.status"
-                      [severity]="getStatusSeverity(order.status)"
-                    ></p-tag>
                   </td>
                   <td>
                     <div
@@ -178,7 +168,7 @@
                         type="button"
                         pInitEditableRow
                         icon="pi pi-pencil"
-                        (click)="onOrderRowEditInit(order)"
+                        (click)="onAccountRowEditInit(account)"
                         class="p-button-rounded p-button-text"
                       ></button>
                       <button
@@ -188,7 +178,7 @@
                         type="button"
                         pSaveEditableRow
                         icon="pi pi-check"
-                        (click)="onOrderRowEditSave(order)"
+                        (click)="onccountRowEditSave(account)"
                         class="p-button-rounded p-button-text p-button-success mr-2"
                       ></button>
                       <button
@@ -198,7 +188,7 @@
                         type="button"
                         pCancelEditableRow
                         icon="pi pi-times"
-                        (click)="onOrderRowEditCancel(order, ri)"
+                        (click)="onAccountRowEditCancel(account, ri)"
                         class="p-button-rounded p-button-text p-button-danger"
                       ></button>
                       <button
@@ -208,7 +198,7 @@
                         pRipple
                         icon="pi pi-trash"
                         class="p-button-rounded p-button-text p-button-danger"
-                        (click)="deleteOrder(order.id)"
+                        (click)="deleteccount(account.accountId)"
                       ></button>
                     </div>
                   </td>
@@ -216,12 +206,14 @@
               </ng-template>
               <ng-template pTemplate="emptymessage">
                 <tr>
-                  <td colspan="6">There are no order for this product yet.</td>
+                  <td colspan="6">
+                    There are no account for this product yet.
+                  </td>
                 </tr>
               </ng-template>
             </p-table>
           </td>
-          <ng-container *ngIf="!rowData.orders">
+          <ng-container *ngIf="!rowData.accounts">
             <td *ngFor="let col of columns; let i = index">
               <p-treeTableToggler
                 [rowNode]="rowNode"

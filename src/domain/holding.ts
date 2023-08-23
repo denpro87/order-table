@@ -7,17 +7,23 @@ export interface Holding {
   sourceOfInvestment: string;
   isLocked: string;
   geography: string;
-  price: string;
-  marketValue: string;
-  portfolioPercent: string;
-  assetClassPercent: string;
+  estimatedAnnualDistribution: number;
+  currentYield: number;
+  quantity: number;
+  price: number;
+  marketValue: number;
+  portfolioPercent: number;
   portfolioManger: string;
+  accounts: Account[];
+}
+
+export interface Account {
   clientId: string;
   clientName: string;
   accountId: string;
   accountName: string;
   accountType: string;
   programType: string;
-  estimatedAnnualDistribution: string;
-  currentYield: string;
+  quantity: number;
+  allocation: number;
 }

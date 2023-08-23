@@ -10,8 +10,7 @@ import * as FileSaver from "file-saver";
 import { MessageService, TreeNode } from "primeng/api";
 
 import { Table } from "primeng/table";
-import { Order } from "../../domain/customer";
-import { Holding } from "../../domain/holding";
+import { Holding, Account } from "../../domain/holding";
 import { CustomerService } from "../../service/customerservice";
 import { HoldingService } from "src/service/holdingService";
 
@@ -47,8 +46,8 @@ export class HoldingComponent implements OnInit {
   holdings!: TreeNode[];
   holdingArray!: Holding[];
 
-  orders!: Order[];
-  clonedOrders: { [s: string]: Order } = {};
+  accounts!: Account[];
+  clonedAccount: { [s: string]: Account } = {};
 
   loading: boolean = true;
 
@@ -56,6 +55,8 @@ export class HoldingComponent implements OnInit {
   frozenCols!: Column[];
   scrollableCols!: Column[];
   selectedColumns!: Column[];
+
+  accountCols!: Column[];
 
   showError: boolean = false;
 
@@ -79,6 +80,7 @@ export class HoldingComponent implements OnInit {
       this.holdingArray = holdingArray;
       this.cols = [
         { field: "holdingName", header: "Holdings", filterType: "text" },
+        { field: "quantity", header: "Qty", filterType: "numeric" },
         { field: "holdingCode", header: "Holding Code", filterType: "text" },
         { field: "price", header: "Price", filterType: "numeric" },
         { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
@@ -99,6 +101,7 @@ export class HoldingComponent implements OnInit {
         },
       ];
       this.scrollableCols = [
+        { field: "quantity", header: "Qty", filterType: "numeric" },
         { field: "holdingCode", header: "Holding Code", filterType: "text" },
         { field: "price", header: "Price", filterType: "numeric" },
         { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
@@ -122,6 +125,14 @@ export class HoldingComponent implements OnInit {
         { field: "holdingName", header: "Holdings", filterType: "text" },
       ];
       this.selectedColumns = this.scrollableCols;
+
+      this.accountCols = [
+        { field: "accountName", header: "Name", filterType: "text" },
+        { field: "quantity", header: "Qty", filterType: "numeric" },
+        { field: "accountType", header: "Account Type", filterType: "text" },
+        { field: "programType", header: "Program Type", filterType: "text" },
+        { field: "allocation", header: "Allocation", filterType: "numeric" },
+      ];
 
       // Initialize with default grouping
       this.selectedGrouping = this.groupingOptions[0];
@@ -165,21 +176,21 @@ export class HoldingComponent implements OnInit {
     }
   }
 
-  deleteOrder(id: string) {
-    this.orders = this.orders.filter((order) => order.id !== id);
+  deleteAccount(id: string) {
+    this.accounts = this.accounts.filter((account) => account.accountId !== id);
   }
 
-  onOrderRowEditInit(order: Order) {
-    this.clonedOrders[order.id as string] = { ...order };
+  onAccountRowEditInit(account: Account) {
+    this.clonedAccount[account.accountId as string] = { ...account };
   }
 
-  onOrderRowEditSave(order: Order) {
-    delete this.clonedOrders[order.id as string];
+  onAccountRowEditSave(account: Account) {
+    delete this.clonedAccount[account.accountId as string];
   }
 
-  onOrderRowEditCancel(order: Order, index: number) {
-    this.orders[index] = this.clonedOrders[order.id as string];
-    delete this.clonedOrders[order.id as string];
+  onAccountRowEditCancel(account: Account, index: number) {
+    this.accounts[index] = this.clonedAccount[account.accountId as string];
+    delete this.clonedAccount[account.accountId as string];
   }
 
   private expandRecursive(node: TreeNode, isExpand: boolean) {
@@ -226,10 +237,10 @@ export class HoldingComponent implements OnInit {
           ? this.groupingData(value, deep + 1)
           : value.map((item) => {
               const itemData = { ...item };
-              delete itemData.orders;
+              delete itemData.accounts;
               return {
                 data: itemData,
-                children: [{ data: { orders: item["orders"] } }],
+                children: [{ data: { accounts: item["accounts"] } }],
               };
             }),
     }));
