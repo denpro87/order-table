@@ -99,6 +99,7 @@ import { ProgressSpinnerModule } from "primeng/progressspinner";
 
 import { CustomerService } from "src/service/customerservice";
 import { HoldingService } from "src/service/holdingService";
+import { AccountTableComponent } from './account-table/account-table.component';
 
 @NgModule({
   imports: [
@@ -196,7 +197,7 @@ import { HoldingService } from "src/service/holdingService";
     CardModule,
     AppRoutingModule,
   ],
-  declarations: [AppComponent, TableFilterMenuDemo, HoldingComponent],
+  declarations: [AppComponent, TableFilterMenuDemo, HoldingComponent, AccountTableComponent],
   bootstrap: [AppComponent],
   providers: [CustomerService, HoldingService],
 })

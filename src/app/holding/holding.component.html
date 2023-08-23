@@ -111,7 +111,14 @@
       >
         <tr style="height: 57px">
           <td *ngIf="rowData.accounts" [attr.colspan]="selectedColumns.length">
-            <p-table [value]="rowData.accounts" dataKey="id" editMode="row">
+            <p-table
+              [value]="rowData.accounts"
+              [frozenColumns]="accountFrozenCols"
+              [columns]="accountScrollableCols"
+              [scrollable]="true"
+              dataKey="id"
+              editMode="row"
+            >
               <ng-template pTemplate="header">
                 <tr>
                   <th

@@ -57,6 +57,8 @@ export class HoldingComponent implements OnInit {
   selectedColumns!: Column[];
 
   accountCols!: Column[];
+  accountScrollableCols!: Column[];
+  accountFrozenCols!: Column[];
 
   showError: boolean = false;
 
@@ -126,8 +128,18 @@ export class HoldingComponent implements OnInit {
       ];
       this.selectedColumns = this.scrollableCols;
 
+      this.accountFrozenCols = [
+        { field: "accountName", header: "Name", filterType: "text" },
+      ];
       this.accountCols = [
         { field: "accountName", header: "Name", filterType: "text" },
+        { field: "quantity", header: "Qty", filterType: "numeric" },
+        { field: "accountType", header: "Account Type", filterType: "text" },
+        { field: "programType", header: "Program Type", filterType: "text" },
+        { field: "allocation", header: "Allocation", filterType: "numeric" },
+      ];
+
+      this.accountScrollableCols = [
         { field: "quantity", header: "Qty", filterType: "numeric" },
         { field: "accountType", header: "Account Type", filterType: "text" },
         { field: "programType", header: "Program Type", filterType: "text" },
