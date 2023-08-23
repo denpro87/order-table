@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import {
   trigger,
   state,
@@ -9,21 +9,9 @@ import {
 import * as FileSaver from "file-saver";
 import { MessageService, TreeNode } from "primeng/api";
 
-import { Table } from "primeng/table";
-import { Holding, Account } from "../../domain/holding";
+import { Holding, Account, Column, DropDownOption } from "../../types";
 import { CustomerService } from "../../service/customerservice";
 import { HoldingService } from "src/service/holdingService";
-
-interface Column {
-  field: string;
-  header: string;
-  filterType: string;
-}
-
-interface DropDownOption {
-  label: string;
-  value: string[];
-}
 
 @Component({
   selector: "app-holding",

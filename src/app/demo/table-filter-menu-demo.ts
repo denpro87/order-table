@@ -10,19 +10,14 @@ import * as FileSaver from "file-saver";
 import { MessageService, TreeNode } from "primeng/api";
 
 import { Table } from "primeng/table";
-import { Customer, Order, Representative } from "../../domain/customer";
+import {
+  Customer,
+  Order,
+  Representative,
+  Column,
+  DropDownOption,
+} from "../../types";
 import { CustomerService } from "../../service/customerservice";
-
-interface Column {
-  field: string;
-  header: string;
-  filterType: string;
-}
-
-interface DropDownOption {
-  label: string;
-  value: string[];
-}
 
 @Component({
   selector: "table-filter-menu-demo",
