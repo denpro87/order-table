@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { TableFilterMenuDemo } from "src/app/demo/table-filter-menu-demo";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
+import { HoldingComponent } from "./holding/holding.component";
 
 // Import PrimeNG modules
 import { AccordionModule } from "primeng/accordion";
@@ -95,8 +96,9 @@ import { AnimateModule } from "primeng/animate";
 import { CardModule } from "primeng/card";
 import { BlockUIModule } from "primeng/blockui";
 import { ProgressSpinnerModule } from "primeng/progressspinner";
+
 import { CustomerService } from "src/service/customerservice";
-import { HoldingComponent } from './holding/holding.component';
+import { HoldingService } from "src/service/holdingService";
 
 @NgModule({
   imports: [
@@ -196,6 +198,6 @@ import { HoldingComponent } from './holding/holding.component';
   ],
   declarations: [AppComponent, TableFilterMenuDemo, HoldingComponent],
   bootstrap: [AppComponent],
-  providers: [CustomerService],
+  providers: [CustomerService, HoldingService],
 })
 export class AppModule {}
