@@ -1,95 +1,94 @@
-<p-table
-  [value]="accounts"
-  [frozenColumns]="accountFrozenCols"
-  [columns]="accountScrollableCols"
-  [scrollable]="true"
-  dataKey="id"
-  editMode="row"
->
-  <ng-template pTemplate="header">
-    <tr>
-      <th *ngFor="let col of accountCols" [ttSortableColumn]="col.field">
-        {{ col.header }}
-        <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
-      </th>
-      <th style="width: 20%"></th>
-    </tr>
-  </ng-template>
-  <ng-template
-    pTemplate="body"
-    let-account
-    let-editing="editing"
-    let-ri="rowIndex"
-  >
-    <tr [pEditableRow]="account">
-      <td>{{ account.accountName }}</td>
-      <td>
-        {{ account.quantity }}
-      </td>
-      <td>
-        {{ account.accountType }}
-      </td>
-      <td>
-        {{ account.programType }}
-      </td>
-      <td>
-        <p-cellEditor>
-          <ng-template pTemplate="input">
-            <input pInputText type="text" [(ngModel)]="account.allocation" />
-          </ng-template>
-          <ng-template pTemplate="output">
-            {{ account.allocation }}
-          </ng-template>
-        </p-cellEditor>
-      </td>
-      <td>
-        <div class="flex align-items-center justify-content-center gap-2">
-          <button
-            *ngIf="!editing"
-            pButton
-            pRipple
-            type="button"
-            pInitEditableRow
-            icon="pi pi-pencil"
-            (click)="onAccountRowEditInit(account)"
-            class="p-button-rounded p-button-text"
-          ></button>
-          <button
-            *ngIf="editing"
-            pButton
-            pRipple
-            type="button"
-            pSaveEditableRow
-            icon="pi pi-check"
-            (click)="onccountRowEditSave(account)"
-            class="p-button-rounded p-button-text p-button-success mr-2"
-          ></button>
-          <button
-            *ngIf="editing"
-            pButton
-            pRipple
-            type="button"
-            pCancelEditableRow
-            icon="pi pi-times"
-            (click)="onAccountRowEditCancel(account, ri)"
-            class="p-button-rounded p-button-text p-button-danger"
-          ></button>
-          <button
-            *ngIf="!editing"
-            type="button"
-            pButton
-            pRipple
-            icon="pi pi-trash"
-            class="p-button-rounded p-button-text p-button-danger"
-            (click)="deleteccount(account.accountId)"
-          ></button>
-        </div>
-      </td>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="6">There are no account for this product yet.</td>
-    </tr>
-  </ng-template>
-</p-table>
+<div>
+  <p-table [value]="accounts" [scrollable]="true" dataKey="id" editMode="row">
+    <ng-template pTemplate="header">
+      <tr>
+        <th rowData.accounts>Account Name</th>
+        <th
+          *ngFor="let col of accountScrollableCols"
+          [ttSortableColumn]="col.field"
+        >
+          {{ col.header }}
+          <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+        </th>
+        <th style="width: 20%"></th>
+      </tr>
+    </ng-template>
+    <ng-template
+      pTemplate="body"
+      let-account
+      let-editing="editing"
+      let-ri="rowIndex"
+    >
+      <tr [pEditableRow]="account">
+        <td>{{ account.accountName }}</td>
+        <td>
+          {{ account.quantity }}
+        </td>
+        <td>
+          {{ account.accountType }}
+        </td>
+        <td>
+          {{ account.programType }}
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input pInputText type="text" [(ngModel)]="account.allocation" />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.allocation }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <div class="flex align-items-center justify-content-center gap-2">
+            <button
+              *ngIf="!editing"
+              pButton
+              pRipple
+              type="button"
+              pInitEditableRow
+              icon="pi pi-pencil"
+              (click)="onAccountRowEditInit(account)"
+              class="p-button-rounded p-button-text"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pSaveEditableRow
+              icon="pi pi-check"
+              (click)="onccountRowEditSave(account)"
+              class="p-button-rounded p-button-text p-button-success mr-2"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pCancelEditableRow
+              icon="pi pi-times"
+              (click)="onAccountRowEditCancel(account, ri)"
+              class="p-button-rounded p-button-text p-button-danger"
+            ></button>
+            <button
+              *ngIf="!editing"
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="deleteccount(account.accountId)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">There are no account for this product yet.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

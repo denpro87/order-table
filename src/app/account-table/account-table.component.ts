@@ -8,7 +8,7 @@ import { Holding, Account, Column } from "../../types";
   styleUrls: ["./account-table.component.scss"],
 })
 export class AccountTableComponent implements OnInit {
-  accounts!: Account[];
+  @Input() accounts!: Account[];
   clonedAccount: { [s: string]: Account } = {};
 
   accountCols!: Column[];
