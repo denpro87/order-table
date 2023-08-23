@@ -117,11 +117,17 @@
         <tr style="height: 57px" *ngIf="!rowData.accounts">
           <ng-container>
             <td *ngFor="let col of columns; let i = index">
-              <p-treeTableToggler
-                [rowNode]="rowNode"
-                *ngIf="col.field === 'holdingName'"
-              ></p-treeTableToggler>
-              {{ rowData[col.field] }}
+              <div class="flex align-items-center">
+                <p-treeTableToggler
+                  [rowNode]="rowNode"
+                  *ngIf="col.field === 'holdingName'"
+                ></p-treeTableToggler>
+                <div
+                  class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
+                >
+                  {{ rowData[col.field] }}
+                </div>
+              </div>
             </td>
           </ng-container>
         </tr>
