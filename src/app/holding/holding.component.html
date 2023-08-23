@@ -1,1 +1,264 @@
-<p>holding works!</p>
+<div class="card">
+  <p-toast></p-toast>
+  <div *ngIf="!loading" [@fadeInOut]>
+    <p-treeTable
+      #tt
+      [value]="treeTableData"
+      [columns]="selectedColumns"
+      [frozenColumns]="frozenCols"
+      sortMode="multiple"
+      [scrollable]="true"
+      scrollHeight="400px"
+      frozenWidth="200px"
+      [reorderableColumns]="true"
+      filterMode="strict"
+      [tableStyle]="{ 'min-width': '80rem' }"
+    >
+      <ng-template pTemplate="caption">
+        <div style="text-align: left; display: flex; gap: 8px">
+          <p-dropdown
+            [options]="groupingOptions"
+            [(ngModel)]="selectedGrouping"
+            optionLabel="label"
+            (onChange)="onGroupingChange()"
+          ></p-dropdown>
+          <p-button
+            [label]="expandedAll ? 'Collapse all' : 'Expand all'"
+            styleClass="p-button-raised p-button-text"
+            (click)="handleExpandRows()"
+          />
+          <p-multiSelect
+            [options]="scrollableCols"
+            [(ngModel)]="selectedColumns"
+            optionLabel="header"
+            selectedItemsLabel="{0} columns selected"
+            [style]="{ width: '20em' }"
+            defaultLabel="Choose Columns"
+          ></p-multiSelect>
+          <div class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              placeholder="Global Search"
+              (input)="tt.filterGlobal($event.target.value, 'contains')"
+            />
+          </div>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-file-excel"
+            (click)="exportExcel()"
+            class="p-button-success mr-2"
+            pTooltip="XLS"
+            tooltipPosition="bottom"
+          ></button>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th
+            *ngFor="let col of columns"
+            [ttSortableColumn]="col.field"
+            ttReorderableColumn
+          >
+            {{ col.header }}
+            <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+          </th>
+        </tr>
+        <tr>
+          <th *ngFor="let col of columns">
+            <input
+              *ngIf="col.filterType === 'text'"
+              pInputText
+              type="text"
+              (input)="
+                tt.filter($event.target.value, col.field, col.filterMatchMode)
+              "
+            />
+            <p-calendar
+              *ngIf="col.filterType === 'date'"
+              [touchUI]="true"
+              [readonlyInput]="true"
+              (input)="
+                tt.filter($event.target.value, col.field, col.filterMatchMode)
+              "
+            ></p-calendar>
+            <p-inputNumber
+              *ngIf="col.filterType === 'numeric'"
+              inputId="currency-us"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              (onInput)="
+                tt.filter(
+                  $event.value?.toString(),
+                  col.field,
+                  col.filterMatchMode
+                )
+              "
+            >
+            </p-inputNumber>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template
+        pTemplate="body"
+        let-rowNode
+        let-rowData="rowData"
+        let-columns="columns"
+      >
+        <tr style="height: 57px">
+          <td *ngIf="rowData.orders" [attr.colspan]="selectedColumns.length">
+            <p-table [value]="rowData.orders" dataKey="id" editMode="row">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th pSortableColumn="id">
+                    Id <p-sortIcon field="price"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="date">
+                    Date <p-sortIcon field="date"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="amount">
+                    Amount <p-sortIcon field="amount"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="status">
+                    Status <p-sortIcon field="status"></p-sortIcon>
+                  </th>
+                  <th style="width: 20%"></th>
+                </tr>
+              </ng-template>
+              <ng-template
+                pTemplate="body"
+                let-order
+                let-editing="editing"
+                let-ri="rowIndex"
+              >
+                <tr [pEditableRow]="order">
+                  <td>{{ order.id }}</td>
+                  <td>
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <p-calendar [(ngModel)]="order.date" />
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ order.date | date : "MM/dd/yyyy" }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td>
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="order.amount"
+                        />
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ order.amount | currency : "USD" }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td>
+                    <p-tag
+                      [value]="order.status"
+                      [severity]="getStatusSeverity(order.status)"
+                    ></p-tag>
+                  </td>
+                  <td>
+                    <div
+                      class="flex align-items-center justify-content-center gap-2"
+                    >
+                      <button
+                        *ngIf="!editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pInitEditableRow
+                        icon="pi pi-pencil"
+                        (click)="onOrderRowEditInit(order)"
+                        class="p-button-rounded p-button-text"
+                      ></button>
+                      <button
+                        *ngIf="editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pSaveEditableRow
+                        icon="pi pi-check"
+                        (click)="onOrderRowEditSave(order)"
+                        class="p-button-rounded p-button-text p-button-success mr-2"
+                      ></button>
+                      <button
+                        *ngIf="editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pCancelEditableRow
+                        icon="pi pi-times"
+                        (click)="onOrderRowEditCancel(order, ri)"
+                        class="p-button-rounded p-button-text p-button-danger"
+                      ></button>
+                      <button
+                        *ngIf="!editing"
+                        type="button"
+                        pButton
+                        pRipple
+                        icon="pi pi-trash"
+                        class="p-button-rounded p-button-text p-button-danger"
+                        (click)="deleteOrder(order.id)"
+                      ></button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="6">There are no order for this product yet.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </td>
+          <ng-container *ngIf="!rowData.orders">
+            <td
+              *ngFor="let col of columns; let i = index"
+              [ngSwitch]="col.field"
+            >
+              <p-treeTableToggler
+                [rowNode]="rowNode"
+                *ngIf="col.field === 'name'"
+              ></p-treeTableToggler>
+
+              <!-- Name -->
+              <ng-container *ngSwitchCase="'name'">{{
+                rowData.name
+              }}</ng-container>
+
+              <!-- Country -->
+              <ng-container *ngSwitchCase="'country'">{{
+                rowData.country?.name
+              }}</ng-container>
+
+              <!-- Agent -->
+              <ng-container *ngSwitchCase="'representative.name'">{{
+                rowData.representative?.name
+              }}</ng-container>
+
+              <!-- Date -->
+              <ng-container *ngSwitchCase="'date'">{{
+                rowData.date | date : "MM/dd/yyyy"
+              }}</ng-container>
+
+              <!-- Balance -->
+              <ng-container *ngSwitchCase="'balance'">
+                {{ rowData.balance | currency : "USD" : "symbol" }}
+              </ng-container>
+            </td>
+          </ng-container>
+        </tr>
+      </ng-template>
+    </p-treeTable>
+  </div>
+</div>

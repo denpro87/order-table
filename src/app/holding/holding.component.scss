@@ -1,0 +1,22 @@
+:host ::ng-deep {
+  .p-progressbar {
+    height: 0.5rem;
+    background-color: #d8dadc;
+
+    .p-progressbar-value {
+      background-color: #607d8b;
+    }
+  }
+
+  .p-datatable > .p-datatable-wrapper {
+    overflow: visible;
+  }
+
+  //   .p-treetable-scrollable-body {
+  //     overflow: visible;
+  //   }
+
+  .p-calendar .p-datepicker {
+    width: 400px;
+  }
+}
