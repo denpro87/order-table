@@ -56,13 +56,21 @@ export class HoldingComponent implements OnInit {
   expandedAll: boolean = false;
 
   treeTableData: any[] = [];
-  groupingOptions: any[] = [{ label: "Asset Class", value: ["assetClass"] }];
+  groupingOptions: any[] = [
+    { label: "Asset Class", value: ["assetClass"] },
+    { label: "Asset Class & Geography", value: ["assetClass", "geography"] },
+    {
+      label: "Asset Class & Sub Class",
+      value: ["assetClass", "subAssetClass"],
+    },
+    {
+      label: "Asset Class, Geography and Sub Class",
+      value: ["assetClass", "geography", "subAssetClass"],
+    },
+  ];
   selectedGrouping: DropDownOption;
 
-  constructor(
-    private customerService: CustomerService,
-    private holdingService: HoldingService
-  ) {}
+  constructor(private holdingService: HoldingService) {}
 
   ngOnInit() {
     this.holdingService.getHoldingData().then((holdingArray) => {
