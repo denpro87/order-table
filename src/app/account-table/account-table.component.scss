@@ -1,2 +1,9 @@
 :host ::ng-deep {
+  .account-table .p-datatable {
+    .p-button.p-button-icon-only {
+      width: 20px;
+      height: fit-content;
+      padding: 0;
+    }
+  }
 }

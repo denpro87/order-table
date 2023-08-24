@@ -1,5 +1,11 @@
 <div>
-  <p-table [value]="accounts" [scrollable]="true" dataKey="id" editMode="row">
+  <p-table
+    [value]="accounts"
+    [scrollable]="true"
+    dataKey="id"
+    editMode="row"
+    class="account-table"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th rowData.accounts>Account Name</th>
@@ -49,6 +55,7 @@
               type="button"
               pInitEditableRow
               icon="pi pi-pencil"
+              styleClass="p-button-sm"
               (click)="onAccountRowEditInit(account)"
               class="p-button-rounded p-button-text"
             ></button>
@@ -59,6 +66,7 @@
               type="button"
               pSaveEditableRow
               icon="pi pi-check"
+              styleClass="p-button-sm"
               (click)="onccountRowEditSave(account)"
               class="p-button-rounded p-button-text p-button-success mr-2"
             ></button>
@@ -69,6 +77,7 @@
               type="button"
               pCancelEditableRow
               icon="pi pi-times"
+              styleClass="p-button-sm"
               (click)="onAccountRowEditCancel(account, ri)"
               class="p-button-rounded p-button-text p-button-danger"
             ></button>
@@ -77,6 +86,7 @@
               type="button"
               pButton
               pRipple
+              styleClass="p-button-sm"
               icon="pi pi-trash"
               class="p-button-rounded p-button-text p-button-danger"
               (click)="deleteccount(account.accountId)"
