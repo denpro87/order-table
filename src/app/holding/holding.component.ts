@@ -227,7 +227,7 @@ export class HoldingComponent implements OnInit {
     );
     return Object.entries(groupingViaCommonProperty).map(([group, value]) => ({
       data: {
-        holdingName: group,
+        holdingName: `${group} (${value.length})`,
         marketValue: value.reduce((accumulator, object) => {
           return accumulator + Number(object.marketValue);
         }, 0),

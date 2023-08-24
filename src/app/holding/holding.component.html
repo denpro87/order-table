@@ -9,19 +9,22 @@
       sortMode="multiple"
       [scrollable]="true"
       scrollHeight="400px"
-      frozenWidth="200px"
+      frozenWidth="350px"
       [reorderableColumns]="true"
       filterMode="strict"
       [tableStyle]="{ 'min-width': '80rem' }"
     >
       <ng-template pTemplate="caption">
         <div style="text-align: left; display: flex; gap: 8px">
-          <p-dropdown
-            [options]="groupingOptions"
-            [(ngModel)]="selectedGrouping"
-            optionLabel="label"
-            (onChange)="onGroupingChange()"
-          ></p-dropdown>
+          <div class="flex align-items-center gap-2">
+            <label>Group by:</label>
+            <p-dropdown
+              [options]="groupingOptions"
+              [(ngModel)]="selectedGrouping"
+              optionLabel="label"
+              (onChange)="onGroupingChange()"
+            ></p-dropdown>
+          </div>
           <p-button
             [label]="expandedAll ? 'Collapse all' : 'Expand all'"
             styleClass="p-button-raised p-button-text"
@@ -62,12 +65,13 @@
             *ngFor="let col of columns"
             [ttSortableColumn]="col.field"
             ttReorderableColumn
+            ttResizableColumn
           >
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
           </th>
         </tr>
-        <tr>
+        <!-- <tr>
           <th *ngFor="let col of columns">
             <input
               *ngIf="col.filterType === 'text'"
@@ -101,7 +105,7 @@
             >
             </p-inputNumber>
           </th>
-        </tr>
+        </tr> -->
       </ng-template>
       <ng-template
         pTemplate="body"
