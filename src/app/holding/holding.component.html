@@ -109,27 +109,42 @@
         let-rowData="rowData"
         let-columns="columns"
       >
-        <tr *ngIf="rowData.accounts">
+        <tr
+          *ngIf="rowData.accounts"
+          [ngStyle]="{ height: 48 * (rowData.accounts.length + 1) + 32 + 'px' }"
+        >
           <td [attr.colspan]="selectedColumns.length">
             <app-account-table [accounts]="rowData.accounts" />
           </td>
         </tr>
         <tr style="height: 57px" *ngIf="!rowData.accounts">
-          <ng-container>
-            <td *ngFor="let col of columns; let i = index">
-              <div class="flex align-items-center">
-                <p-treeTableToggler
-                  [rowNode]="rowNode"
-                  *ngIf="col.field === 'holdingName'"
-                ></p-treeTableToggler>
-                <div
-                  class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
-                >
-                  {{ rowData[col.field] }}
-                </div>
+          <td *ngFor="let col of columns; let i = index">
+            <div class="flex align-items-center">
+              <p-treeTableToggler
+                [rowNode]="rowNode"
+                *ngIf="col.field === 'holdingName'"
+              ></p-treeTableToggler>
+              <div
+                class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
+              >
+                {{ rowData[col.field] }}
               </div>
-            </td>
-          </ng-container>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="frozenbody" let-rowNode let-rowData="rowData">
+        <tr
+          *ngIf="rowData.accounts"
+          [ngStyle]="{ height: 48 * (rowData.accounts.length + 1) + 32 + 'px' }"
+        >
+          <td></td>
+        </tr>
+        <tr style="height: 57px" *ngIf="!rowData.accounts">
+          <td>
+            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+            {{ rowData.holdingName }}
+          </td>
         </tr>
       </ng-template>
     </p-treeTable>
