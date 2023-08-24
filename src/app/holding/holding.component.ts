@@ -7,10 +7,9 @@ import {
   animate,
 } from "@angular/animations";
 import * as FileSaver from "file-saver";
-import { MessageService, TreeNode } from "primeng/api";
+import { MessageService, TreeNode, SelectItemGroup } from "primeng/api";
 
 import { Holding, Account, Column, DropDownOption } from "../../types";
-import { CustomerService } from "../../service/customerservice";
 import { HoldingService } from "src/service/holdingService";
 
 @Component({
@@ -66,6 +65,39 @@ export class HoldingComponent implements OnInit {
     {
       label: "Asset Class, Geography and Sub Class",
       value: ["assetClass", "geography", "subAssetClass"],
+    },
+  ];
+  groupedColumns = [
+    {
+      label: "Group 1",
+      value: "group1",
+      items: [
+        { field: "quantity", header: "Qty", filterType: "numeric" },
+        { field: "holdingCode", header: "Holding Code", filterType: "text" },
+        { field: "price", header: "Price", filterType: "numeric" },
+        { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+      ],
+    },
+    {
+      label: "Group 2",
+      value: "group2",
+      items: [
+        {
+          field: "portfolioPercent",
+          header: "% of Port",
+          filterType: "numeric",
+        },
+        {
+          field: "assetClassPercent",
+          header: "% of Class",
+          filterType: "numeric",
+        },
+        {
+          field: "portfolioManger",
+          header: "port.Manger",
+          filterType: "text",
+        },
+      ],
     },
   ];
   selectedGrouping: DropDownOption;

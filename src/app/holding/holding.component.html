@@ -15,48 +15,55 @@
       [tableStyle]="{ 'min-width': '80rem' }"
     >
       <ng-template pTemplate="caption">
-        <div style="text-align: left; display: flex; gap: 8px">
+        <div class="flex align-items-center gap-2 justify-content-between">
           <div class="flex align-items-center gap-2">
-            <label>Group by:</label>
-            <p-dropdown
-              [options]="groupingOptions"
-              [(ngModel)]="selectedGrouping"
-              optionLabel="label"
-              (onChange)="onGroupingChange()"
-            ></p-dropdown>
-          </div>
-          <p-button
-            [label]="expandedAll ? 'Collapse all' : 'Expand all'"
-            styleClass="p-button-raised p-button-text"
-            (click)="handleExpandRows()"
-          />
-          <p-multiSelect
-            [options]="scrollableCols"
-            [(ngModel)]="selectedColumns"
-            optionLabel="header"
-            selectedItemsLabel="{0} columns selected"
-            [style]="{ width: '20em' }"
-            defaultLabel="Choose Columns"
-          ></p-multiSelect>
-          <div class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input
-              type="text"
-              pInputText
-              placeholder="Global Search"
-              (input)="tt.filterGlobal($event.target.value, 'contains')"
+            <div class="flex align-items-center gap-2">
+              <label>Group by:</label>
+              <p-dropdown
+                [options]="groupingOptions"
+                [(ngModel)]="selectedGrouping"
+                optionLabel="label"
+                (onChange)="onGroupingChange()"
+              ></p-dropdown>
+            </div>
+            <p-divider layout="vertical"></p-divider>
+            <p-button
+              [label]="expandedAll ? 'Collapse all' : 'Expand all'"
+              styleClass="p-button-raised p-button-text"
+              (click)="handleExpandRows()"
             />
           </div>
-          <button
-            type="button"
-            pButton
-            pRipple
-            icon="pi pi-file-excel"
-            (click)="exportExcel()"
-            class="p-button-success mr-2"
-            pTooltip="XLS"
-            tooltipPosition="bottom"
-          ></button>
+          <div class="flex align-items-center gap-2">
+            <p-multiSelect
+              [options]="groupedColumns"
+              [(ngModel)]="selectedColumns"
+              optionLabel="header"
+              selectedItemsLabel="{0} columns selected"
+              [style]="{ width: '20em' }"
+              defaultLabel="Show/Hide Columns"
+              [group]="true"
+            >
+            </p-multiSelect>
+            <div class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                placeholder="Global Search"
+                (input)="tt.filterGlobal($event.target.value, 'contains')"
+              />
+            </div>
+            <button
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-file-excel"
+              (click)="exportExcel()"
+              class="p-button-success mr-2"
+              pTooltip="XLS"
+              tooltipPosition="bottom"
+            ></button>
+          </div>
         </div>
       </ng-template>
       <ng-template pTemplate="header" let-columns>
