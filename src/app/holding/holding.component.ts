@@ -231,6 +231,7 @@ export class HoldingComponent implements OnInit {
         marketValue: value.reduce((accumulator, object) => {
           return accumulator + Number(object.marketValue);
         }, 0),
+        isGroup: true,
       },
       children:
         deep < this.selectedGrouping.value.length - 1

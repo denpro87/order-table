@@ -121,7 +121,11 @@
             <app-account-table [accounts]="rowData.accounts" />
           </td>
         </tr>
-        <tr style="height: 57px" *ngIf="!rowData.accounts">
+        <tr
+          style="height: 57px"
+          *ngIf="!rowData.accounts"
+          [ngClass]="{ group: rowData.isGroup }"
+        >
           <td *ngFor="let col of columns; let i = index">
             <div class="flex align-items-center">
               <p-treeTableToggler
@@ -144,7 +148,11 @@
         >
           <td></td>
         </tr>
-        <tr style="height: 57px" *ngIf="!rowData.accounts">
+        <tr
+          style="height: 57px"
+          *ngIf="!rowData.accounts"
+          [ngClass]="{ group: rowData.isGroup }"
+        >
           <td>
             <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
             {{ rowData.holdingName }}
