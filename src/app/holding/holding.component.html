@@ -4,13 +4,12 @@
     <p-treeTable
       #tt
       [value]="treeTableData"
-      [columns]="selectedColumns"
-      [frozenColumns]="frozenCols"
+      [columns]="cols"
       sortMode="multiple"
-      [scrollable]="true"
       scrollHeight="400px"
-      frozenWidth="350px"
       [reorderableColumns]="true"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
       filterMode="strict"
       [tableStyle]="{ 'min-width': '80rem' }"
     >
@@ -69,10 +68,13 @@
       <ng-template pTemplate="header" let-columns>
         <tr>
           <th
-            *ngFor="let col of columns"
+            *ngFor="let col of columns; let i = index"
             [ttSortableColumn]="col.field"
             ttReorderableColumn
             ttResizableColumn
+            [ngStyle]="{
+              width: i === 0 ? '450px' : 'fit-content'
+            }"
           >
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
@@ -120,20 +122,18 @@
         let-rowData="rowData"
         let-columns="columns"
       >
-        <tr
-          *ngIf="rowData.accounts"
-          [ngStyle]="{ height: 48 * (rowData.accounts.length + 1) + 32 + 'px' }"
-        >
+        <tr *ngIf="rowData.accounts">
           <td [attr.colspan]="selectedColumns.length">
             <app-account-table [accounts]="rowData.accounts" />
           </td>
         </tr>
-        <tr
-          style="height: 57px"
-          *ngIf="!rowData.accounts"
-          [ngClass]="{ group: rowData.isGroup }"
-        >
-          <td *ngFor="let col of columns; let i = index">
+        <tr *ngIf="!rowData.accounts" [ngClass]="{ group: rowData.isGroup }">
+          <td
+            *ngFor="let col of columns; let i = index"
+            [ngStyle]="{
+              width: i === 0 ? '450px' : 'fit-content'
+            }"
+          >
             <div class="flex align-items-center">
               <p-treeTableToggler
                 [rowNode]="rowNode"
@@ -145,24 +145,6 @@
                 {{ rowData[col.field] }}
               </div>
             </div>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="frozenbody" let-rowNode let-rowData="rowData">
-        <tr
-          *ngIf="rowData.accounts"
-          [ngStyle]="{ height: 48 * (rowData.accounts.length + 1) + 32 + 'px' }"
-        >
-          <td></td>
-        </tr>
-        <tr
-          style="height: 57px"
-          *ngIf="!rowData.accounts"
-          [ngClass]="{ group: rowData.isGroup }"
-        >
-          <td>
-            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-            {{ rowData.holdingName }}
           </td>
         </tr>
       </ng-template>

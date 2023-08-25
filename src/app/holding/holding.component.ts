@@ -49,8 +49,6 @@ export class HoldingComponent implements OnInit {
   loading: boolean = true;
 
   cols!: Column[];
-  frozenCols!: Column[];
-  scrollableCols!: Column[];
   selectedColumns!: Column[];
 
   accountCols!: Column[];
@@ -128,6 +126,87 @@ export class HoldingComponent implements OnInit {
     });
   }
 
+  setHoldingWithAccountColumns() {
+    this.cols = [
+      { field: "holdingName", header: "Holdings", filterType: "text" },
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "price", header: "Price", filterType: "numeric" },
+      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+      {
+        field: "portfolioPercent",
+        header: "% of Port",
+        filterType: "numeric",
+      },
+      {
+        field: "assetClassPercent",
+        header: "% of Class",
+        filterType: "numeric",
+      },
+    ];
+    this.selectedColumns = this.cols;
+
+    this.accountFrozenCols = [
+      { field: "accountName", header: "Name", filterType: "text" },
+    ];
+    this.accountCols = [
+      { field: "accountName", header: "Name", filterType: "text" },
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "accountType", header: "Account Type", filterType: "text" },
+      { field: "programType", header: "Program Type", filterType: "text" },
+      { field: "allocation", header: "Allocation", filterType: "numeric" },
+    ];
+
+    this.accountScrollableCols = [
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "accountType", header: "Account Type", filterType: "text" },
+      { field: "programType", header: "Program Type", filterType: "text" },
+      { field: "allocation", header: "Allocation", filterType: "numeric" },
+    ];
+  }
+
+  setAccountWithHoldingColumns() {
+    this.cols = [
+      { field: "holdingName", header: "Holdings", filterType: "text" },
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "price", header: "Price", filterType: "numeric" },
+      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+      {
+        field: "portfolioPercent",
+        header: "% of Port",
+        filterType: "numeric",
+      },
+      {
+        field: "assetClassPercent",
+        header: "% of Class",
+        filterType: "numeric",
+      },
+      {
+        field: "allocation",
+        header: "Alloc. $",
+        filterType: "numeric",
+      },
+    ];
+    this.selectedColumns = this.cols;
+
+    this.accountFrozenCols = [
+      { field: "accountName", header: "Name", filterType: "text" },
+    ];
+    this.accountCols = [
+      { field: "accountName", header: "Name", filterType: "text" },
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "accountType", header: "Account Type", filterType: "text" },
+      { field: "programType", header: "Program Type", filterType: "text" },
+      { field: "allocation", header: "Allocation", filterType: "numeric" },
+    ];
+
+    this.accountScrollableCols = [
+      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "accountType", header: "Account Type", filterType: "text" },
+      { field: "programType", header: "Program Type", filterType: "text" },
+      { field: "allocation", header: "Allocation", filterType: "numeric" },
+    ];
+  }
+
   exportExcel() {
     import("xlsx").then((xlsx) => {
       const worksheet = xlsx.utils.json_to_sheet(this.currentArrayData);
@@ -169,91 +248,6 @@ export class HoldingComponent implements OnInit {
       this.expandRecursive(node, this.expandedAll);
     });
     this.treeTableData = cloneData;
-  }
-
-  setHoldingWithAccountColumns() {
-    this.scrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "price", header: "Price", filterType: "numeric" },
-      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
-      {
-        field: "portfolioPercent",
-        header: "% of Port",
-        filterType: "numeric",
-      },
-      {
-        field: "assetClassPercent",
-        header: "% of Class",
-        filterType: "numeric",
-      },
-    ];
-    this.frozenCols = [
-      { field: "holdingName", header: "Holdings", filterType: "text" },
-    ];
-    this.selectedColumns = this.scrollableCols;
-
-    this.accountFrozenCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-    ];
-    this.accountCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-
-    this.accountScrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-  }
-
-  setAccountWithHoldingColumns() {
-    this.scrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "price", header: "Price", filterType: "numeric" },
-      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
-      {
-        field: "portfolioPercent",
-        header: "% of Port",
-        filterType: "numeric",
-      },
-      {
-        field: "assetClassPercent",
-        header: "% of Class",
-        filterType: "numeric",
-      },
-      {
-        field: "allocation",
-        header: "Alloc. $",
-        filterType: "numeric",
-      },
-    ];
-    this.frozenCols = [
-      { field: "holdingName", header: "Holdings", filterType: "text" },
-    ];
-    this.selectedColumns = this.scrollableCols;
-
-    this.accountFrozenCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-    ];
-    this.accountCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-
-    this.accountScrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
   }
 
   onGroupingChange(): void {
@@ -313,7 +307,7 @@ export class HoldingComponent implements OnInit {
     );
     return Object.entries(groupingViaCommonProperty).map(([group, value]) => ({
       data: {
-        holdingName: `${value[0].accountName}} (${value[0].accountId}) ${group}`,
+        holdingName: `${value[0].accountName} (${value[0].accountId}) ${group}`,
         marketValue: value.reduce((accumulator, object) => {
           return accumulator + Number(object.marketValue || "0");
         }, 0),
