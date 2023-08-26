@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 
-import { Holding, Account, Column } from "../../types";
+import { Holding, Account, Column } from "../../../types";
 
 @Component({
   selector: "app-account-table",

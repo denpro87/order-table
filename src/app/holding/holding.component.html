@@ -4,7 +4,7 @@
     <p-treeTable
       #tt
       [value]="treeTableData"
-      [columns]="cols"
+      [columns]="selectedColumns"
       sortMode="multiple"
       scrollHeight="400px"
       [reorderableColumns]="true"
@@ -33,16 +33,7 @@
             />
           </div>
           <div class="flex align-items-center gap-2">
-            <p-multiSelect
-              [options]="groupedColumns"
-              [(ngModel)]="selectedColumns"
-              optionLabel="header"
-              selectedItemsLabel="{0} columns selected"
-              [style]="{ width: '20em' }"
-              defaultLabel="Show/Hide Columns"
-              [group]="true"
-            >
-            </p-multiSelect>
+            <app-column-filter (columnsChangeEvent)="onColumnsChange($event)" />
             <div class="p-input-icon-left">
               <i class="pi pi-search"></i>
               <input

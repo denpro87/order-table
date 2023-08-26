@@ -1,0 +1,45 @@
+<p-overlayPanel #op>
+  <form class="w-25rem flex flex-column gap-3" [formGroup]="formGroup">
+    <div
+      class="flex justify-content-between align-items-center border-bottom-1 border-black-alpha-20 pb-3"
+    >
+      <label class="font-bold text-xl text-primary">Columns</label>
+      <p-button
+        label="Secondary"
+        styleClass="p-button-outlined"
+        icon="pi pi-refresh"
+        label="Reset to default"
+        (click)="resetToDefault()"
+      ></p-button>
+    </div>
+    <span class="p-input-icon-right">
+      <i class="pi pi-search"></i>
+      <input type="text" pInputText formControlName="search" class="w-full" />
+    </span>
+    <p-accordion
+      [multiple]="true"
+      [activeIndex]="[0, 1, 2]"
+      formGroupName="columns"
+    >
+      <p-accordionTab *ngFor="let node of nodes" [header]="node.label">
+        <div class="flex flex-column gap-3">
+          <p-checkbox
+            *ngFor="let item of node.children"
+            [formControlName]="item.key"
+            [label]="item.label"
+            [binary]="true"
+            [disabled]="true"
+          ></p-checkbox>
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+  </form>
+</p-overlayPanel>
+<p-button
+  label="Secondary"
+  styleClass="p-button-outlined p-button-secondary"
+  (click)="op.toggle($event)"
+  icon="pi pi-angle-down"
+  iconPos="right"
+  label="Show / Hide Columns"
+></p-button>

@@ -50,16 +50,18 @@ export class HoldingComponent implements OnInit {
 
   cols!: Column[];
   selectedColumns!: Column[];
-
-  accountCols!: Column[];
-  accountScrollableCols!: Column[];
-  accountFrozenCols!: Column[];
+  selectedColumnsKeys = [
+    "holdingName",
+    "allocationP",
+    "allocation",
+    "price",
+    "quantity",
+    "marketValue",
+    "portfolioPercent",
+    "classPercent",
+  ];
 
   showError: boolean = false;
-
-  expandedGroups: string[] = [];
-  expandedRowKeys: any[] = [];
-
   expandedAll: boolean = false;
 
   treeTableData: any[] = [];
@@ -126,6 +128,12 @@ export class HoldingComponent implements OnInit {
     });
   }
 
+  setColumns() {
+    this.selectedColumns = [...this.cols].filter((col) =>
+      this.selectedColumnsKeys.includes(col.field)
+    );
+  }
+
   setHoldingWithAccountColumns() {
     this.cols = [
       { field: "holdingName", header: "Holdings", filterType: "text" },
@@ -143,25 +151,7 @@ export class HoldingComponent implements OnInit {
         filterType: "numeric",
       },
     ];
-    this.selectedColumns = this.cols;
-
-    this.accountFrozenCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-    ];
-    this.accountCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-
-    this.accountScrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
+    this.setColumns();
   }
 
   setAccountWithHoldingColumns() {
@@ -186,25 +176,7 @@ export class HoldingComponent implements OnInit {
         filterType: "numeric",
       },
     ];
-    this.selectedColumns = this.cols;
-
-    this.accountFrozenCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-    ];
-    this.accountCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-
-    this.accountScrollableCols = [
-      { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
+    this.setColumns();
   }
 
   exportExcel() {
@@ -261,6 +233,11 @@ export class HoldingComponent implements OnInit {
       this.setHoldingWithAccountColumns();
       this.updateTreeTableData();
     }
+  }
+
+  onColumnsChange(columns: string[]) {
+    this.selectedColumnsKeys = columns;
+    this.setColumns();
   }
 
   holdingGroupingData(list, deep) {
