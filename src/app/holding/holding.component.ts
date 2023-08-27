@@ -112,6 +112,7 @@ export class HoldingComponent implements OnInit {
     },
   ];
   selectedGrouping: DropDownOption;
+  filterOptions: any[] = [];
 
   constructor(private holdingService: HoldingService) {}
 
@@ -120,6 +121,7 @@ export class HoldingComponent implements OnInit {
       console.log(arrayData);
       this.loading = false;
       this.arrayData = arrayData;
+      this.stFilters();
       this.setAccountWithHoldingColumns();
       // Initialize with default grouping
       this.currentArrayData = this.arrayData.athArrData;
@@ -132,6 +134,47 @@ export class HoldingComponent implements OnInit {
     this.selectedColumns = [...this.cols].filter((col) =>
       this.selectedColumnsKeys.includes(col.field)
     );
+  }
+
+  stFilters() {
+    const account = this.getGroupingViaProperty(
+      [...this.arrayData.athArrData],
+      "accountName - accountType"
+    );
+    const programType = this.getGroupingViaProperty(
+      this.arrayData.athArrData,
+      "programType"
+    );
+    const accountType = this.getGroupingViaProperty(
+      this.arrayData.athArrData,
+      "accountType"
+    );
+    this.filterOptions = [
+      {
+        key: "accountName - accountType",
+        label: "Account",
+        children: account.map((item) => ({
+          key: `accountName - accountType, ${item}`,
+          label: item,
+        })),
+      },
+      {
+        key: "programType",
+        label: "Program Type",
+        children: programType.map((item) => ({
+          key: `programType, ${item}`,
+          label: item,
+        })),
+      },
+      {
+        key: "accountType",
+        label: "Account Type",
+        children: accountType.map((item) => ({
+          key: `accountType, ${item}`,
+          label: item,
+        })),
+      },
+    ];
   }
 
   setHoldingWithAccountColumns() {
@@ -238,6 +281,65 @@ export class HoldingComponent implements OnInit {
   onColumnsChange(columns: string[]) {
     this.selectedColumnsKeys = columns;
     this.setColumns();
+  }
+
+  checkMatch(filters, row) {
+    let isMatch = filters.length === 0;
+    for (const filter of filters) {
+      const [keysString, value] = filter.split(", ");
+      const keys = keysString.split(" - ");
+      const values = value.split(" - ");
+      if (keys.length > 1) {
+        if (values[0] === row[keys[0]] && values[1] === row[keys[1]]) {
+          isMatch = true;
+          break;
+        }
+      } else {
+        if (value === row[keysString]) {
+          isMatch = true;
+          break;
+        }
+      }
+    }
+    return isMatch;
+  }
+  onFilterChange(filters: string[]) {
+    const accountFilters = filters.filter((filter) =>
+      filter.includes("accountName")
+    );
+    const programTypeFilters = filters.filter((filter) =>
+      filter.includes("programType")
+    );
+    const accountTypeFilters = filters.filter(
+      (filter) =>
+        filter.includes("accountType") && !filter.includes("accountName")
+    );
+    this.currentArrayData = this.arrayData.athArrData.filter((row) => {
+      let isMatch = this.checkMatch(accountFilters, row);
+      if (!isMatch) return false;
+      isMatch = this.checkMatch(programTypeFilters, row);
+      if (!isMatch) return false;
+      isMatch = this.checkMatch(accountTypeFilters, row);
+      return isMatch;
+    });
+    this.updateTreeTableData();
+  }
+
+  getGroupingViaProperty(list, keysString) {
+    const keys = keysString.split(" - ");
+    const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
+      (acc, current) => {
+        const key =
+          keys.length > 1
+            ? `${current[keys[0]]} - ${current[keys[1]]}`
+            : current[keysString];
+        acc[key] = acc[key] ?? [];
+        acc[key].push(current);
+        return acc;
+      },
+      {}
+    );
+    return Object.keys(groupingViaCommonProperty);
   }
 
   holdingGroupingData(list, deep) {

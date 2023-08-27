@@ -101,6 +101,7 @@ import { CustomerService } from "src/service/customerservice";
 import { HoldingService } from "src/service/holdingService";
 import { AccountTableComponent } from "./components/account-table/account-table.component";
 import { ColumnFilterComponent } from "./components/column-filter/column-filter.component";
+import { RowFilterComponent } from "./components/row-filter/row-filter.component";
 
 @NgModule({
   imports: [
@@ -204,6 +205,7 @@ import { ColumnFilterComponent } from "./components/column-filter/column-filter.
     HoldingComponent,
     AccountTableComponent,
     ColumnFilterComponent,
+    RowFilterComponent,
   ],
   bootstrap: [AppComponent],
   providers: [CustomerService, HoldingService],

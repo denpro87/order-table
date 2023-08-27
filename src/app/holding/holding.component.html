@@ -33,6 +33,10 @@
             />
           </div>
           <div class="flex align-items-center gap-2">
+            <app-row-filter
+              [filterOptions]="filterOptions"
+              (filterChangeEvent)="onFilterChange($event)"
+            />
             <app-column-filter (columnsChangeEvent)="onColumnsChange($event)" />
             <div class="p-input-icon-left">
               <i class="pi pi-search"></i>

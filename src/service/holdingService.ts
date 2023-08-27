@@ -250,7 +250,6 @@ export class HoldingService {
       return accArr.concat(clientAccountsArr);
     }, []);
 
-    // console.log(athArrData.map(({holdings})=>holdings))
     // per account, recalculate `allocation` and `portfolioPercent`??
 
     const htaObjData = masterData.reduce((holdingKVMap, client) => {
