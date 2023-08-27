@@ -66,7 +66,7 @@ export class HoldingComponent implements OnInit {
 
   treeTableData: any[] = [];
   groupingOptions: any[] = [
-    { label: "Account", value: ["accountType"] },
+    { label: "Account", value: ["accountName - accountType"] },
     { label: "Asset Class", value: ["assetClass"] },
     { label: "Asset Class & Geography", value: ["assetClass", "geography"] },
     {
@@ -375,20 +375,33 @@ export class HoldingComponent implements OnInit {
   }
 
   accountGroupingData(list, deep) {
-    const key = this.selectedGrouping.value[deep];
+    const keysString = this.selectedGrouping.value[deep];
+    const keys = keysString.split(" - ");
     const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
       (acc, current) => {
-        acc[current[key]] = acc[current[key]] ?? [];
-        acc[current[key]].push(current);
+        const key =
+          keys.length > 1
+            ? `${current[keys[0]]} - ${current[keys[1]]}`
+            : current[keysString];
+        acc[key] = acc[key] ?? [];
+        acc[key].push(current);
         return acc;
       },
       {}
     );
+
     return Object.entries(groupingViaCommonProperty).map(([group, value]) => ({
       data: {
         holdingName: `${value[0].accountName} (${value[0].accountId}) ${group}`,
         marketValue: value.reduce((accumulator, object) => {
-          return accumulator + Number(object.marketValue || "0");
+          return (
+            accumulator +
+            Number(
+              object.holdings.reduce((accumulator, holdingObject) => {
+                return accumulator + Number(holdingObject.marketValue || "0");
+              }, 0) || "0"
+            )
+          );
         }, 0),
         isGroup: true,
       },
@@ -398,7 +411,18 @@ export class HoldingComponent implements OnInit {
           : value.map((item) => {
               const itemData = { ...item };
               return {
-                data: { ...itemData, holdingName: itemData.accountName },
+                data: {
+                  ...itemData,
+                  holdingName: itemData.accountName,
+                  marketValue: itemData.holdings.reduce(
+                    (accumulator, holdingObject) => {
+                      return (
+                        accumulator + Number(holdingObject.marketValue || "0")
+                      );
+                    },
+                    0
+                  ),
+                },
                 children: itemData.holdings.map((item) => ({
                   data: item,
                 })),
