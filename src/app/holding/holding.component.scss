@@ -12,8 +12,13 @@
     width: 400px;
   }
 
-  .p-treetable .p-treetable-tbody > tr.group {
-    background: #f2f3f3;
-    color: #579cd7;
+  .p-treetable .p-treetable-tbody {
+    > tr.group {
+      background: #fafafa;
+      color: #579cd7;
+    }
+    > tr.total {
+      background: #f2f3f3;
+    }
   }
 }

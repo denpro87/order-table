@@ -122,7 +122,10 @@
             <app-account-table [accounts]="rowData.accounts" />
           </td>
         </tr>
-        <tr *ngIf="!rowData.accounts" [ngClass]="{ group: rowData.isGroup }">
+        <tr
+          *ngIf="!rowData.accounts"
+          [ngClass]="{ group: rowData.isGroup, total: rowData.isTotal }"
+        >
           <td
             *ngFor="let col of columns; let i = index"
             [ngStyle]="{
@@ -136,6 +139,7 @@
               ></p-treeTableToggler>
               <div
                 class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
+                [ngClass]="{ 'font-bold': rowData.isTotal }"
               >
                 {{ rowData[col.field] }}
               </div>
