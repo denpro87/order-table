@@ -7,7 +7,7 @@ import {
   animate,
 } from "@angular/animations";
 import * as FileSaver from "file-saver";
-import { MessageService, TreeNode, SelectItemGroup } from "primeng/api";
+import { MessageService, TreeNode, ConfirmationService } from "primeng/api";
 
 import {
   HoldingWithAccount,
@@ -34,7 +34,7 @@ import { HoldingService } from "src/service/holdingService";
       transition("void <=> *", animate(500)),
     ]),
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class HoldingComponent implements OnInit {
   arrayData: {
@@ -44,7 +44,7 @@ export class HoldingComponent implements OnInit {
   currentArrayData: any[];
 
   accounts!: Account[];
-  clonedAccount: { [s: string]: Account } = {};
+  clonedHolding: { [s: string]: Holding } = {};
 
   loading: boolean = true;
 
@@ -115,7 +115,10 @@ export class HoldingComponent implements OnInit {
   filterOptions: any[] = [];
   currentFilters: string[] = [];
 
-  constructor(private holdingService: HoldingService) {}
+  constructor(
+    private holdingService: HoldingService,
+    private confirmationService: ConfirmationService
+  ) {}
 
   ngOnInit() {
     this.holdingService.getHoldingData().then((arrayData) => {
@@ -129,6 +132,10 @@ export class HoldingComponent implements OnInit {
       this.selectedGrouping = this.groupingOptions[0];
       this.updateTreeTableData();
     });
+  }
+
+  get isAccountView() {
+    return this.selectedGrouping.label === "Account";
   }
 
   setColumns() {
@@ -465,5 +472,77 @@ export class HoldingComponent implements OnInit {
       this.treeTableData = this.holdingGroupingData(this.currentArrayData, 0);
     }
     console.log("threeTableData=====>", this.treeTableData);
+  }
+
+  confirmDeleteHolding(event: Event, holdingCode: string) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: "Are you sure that you want to proceed?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        this.deleteHolding(holdingCode);
+      },
+    });
+  }
+
+  deleteHolding(holdingCode: string) {
+    const clonedData = [...this.treeTableData];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.filter(
+        (child) => child.data.holdingCode !== holdingCode
+      ),
+    }));
+  }
+
+  onHoldingRowEditInit(holding: Holding) {
+    this.clonedHolding[holding.holdingCode] = { ...holding };
+    const clonedData = [...this.treeTableData];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.map((child) =>
+        child.data.holdingCode === holding.holdingCode
+          ? {
+              ...child,
+              data: { ...child.data, isEditing: true },
+            }
+          : child
+      ),
+    }));
+  }
+
+  onHoldingRowEditSave(holding: Holding) {
+    const clonedData = [...this.treeTableData];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.map((child) =>
+        child.data.holdingCode === holding.holdingCode
+          ? {
+              ...child,
+              data: { ...child.data, isEditing: false },
+            }
+          : child
+      ),
+    }));
+    delete this.clonedHolding[holding.holdingCode];
+  }
+
+  onHoldingRowEditCancel(holding: Holding) {
+    const clonedData = [...this.treeTableData];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.map((child) =>
+        child.data.holdingCode === holding.holdingCode
+          ? {
+              ...child,
+              data: {
+                ...this.clonedHolding[holding.holdingCode],
+                isEditing: false,
+              },
+            }
+          : child
+      ),
+    }));
+    delete this.clonedHolding[holding.holdingCode];
   }
 }

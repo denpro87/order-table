@@ -52,7 +52,7 @@ export interface Holding {
   price: number;
   marketValue: number;
   portfolioPercent: number;
-  "portfolioManger ": string;
-  _quantity: number;
-  "allocation ": number;
+  portfolioManger: string;
+  quantity: number;
+  allocation: number;
 }

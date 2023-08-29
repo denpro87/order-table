@@ -12,6 +12,7 @@
       columnResizeMode="expand"
       filterMode="strict"
       [tableStyle]="{ 'min-width': '80rem' }"
+      class="holding-tree-table"
     >
       <ng-template pTemplate="caption">
         <div class="flex align-items-center gap-2 justify-content-between">
@@ -74,6 +75,7 @@
             {{ col.header }}
             <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
           </th>
+          <th *ngIf="isAccountView"></th>
         </tr>
         <!-- <tr>
           <th *ngFor="let col of columns">
@@ -141,12 +143,75 @@
                 class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
                 [ngClass]="{ 'font-bold': rowData.isTotal }"
               >
-                {{ rowData[col.field] }}
+                <input
+                  pInputText
+                  type="number"
+                  class="w-full"
+                  [(ngModel)]="rowData[col.field]"
+                  *ngIf="
+                    rowData.isEditing &&
+                      (col.field === 'quantity' ||
+                        col.field === 'allocationPercent' ||
+                        col.field === 'allocation');
+                    else output
+                  "
+                />
+                <ng-template #output>
+                  {{ rowData[col.field] }}
+                </ng-template>
               </div>
+            </div>
+          </td>
+          <td *ngIf="isAccountView">
+            <div
+              class="flex align-items-center justify-content-center gap-2"
+              *ngIf="!rowData.isGroup && !rowData.isTotal"
+            >
+              <button
+                *ngIf="!rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-pencil"
+                styleClass="p-button-sm"
+                class="p-button-rounded p-button-text row-action-button"
+                (click)="onHoldingRowEditInit(rowData)"
+              ></button>
+              <button
+                *ngIf="rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-check"
+                styleClass="p-button-sm"
+                (click)="onHoldingRowEditSave(rowData)"
+                class="p-button-rounded p-button-text p-button-success mr-2 row-action-button"
+              ></button>
+              <button
+                *ngIf="rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-times"
+                styleClass="p-button-sm"
+                (click)="onHoldingRowEditCancel(rowData)"
+                class="p-button-rounded p-button-text p-button-danger row-action-button"
+              ></button>
+              <button
+                *ngIf="!rowData.isEditing"
+                type="button"
+                pButton
+                pRipple
+                styleClass="p-button-sm"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger row-action-button"
+                (click)="confirmDeleteHolding($event, rowData.holdingCode)"
+              ></button>
             </div>
           </td>
         </tr>
       </ng-template>
     </p-treeTable>
   </div>
+  <p-confirmPopup></p-confirmPopup>
 </div>

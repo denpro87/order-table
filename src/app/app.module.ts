@@ -24,6 +24,7 @@ import { CheckboxModule } from "primeng/checkbox";
 import { ChipModule } from "primeng/chip";
 import { ChipsModule } from "primeng/chips";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { ConfirmPopupModule } from "primeng/confirmpopup";
 import { ColorPickerModule } from "primeng/colorpicker";
 import { ContextMenuModule } from "primeng/contextmenu";
 import { DataViewModule } from "primeng/dataview";
@@ -127,6 +128,7 @@ import { RowFilterComponent } from "./components/row-filter/row-filter.component
     ChipModule,
     ColorPickerModule,
     ConfirmDialogModule,
+    ConfirmPopupModule,
     ContextMenuModule,
     VirtualScrollerModule,
     DataViewModule,
