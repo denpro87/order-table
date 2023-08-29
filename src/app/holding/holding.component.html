@@ -164,8 +164,12 @@
           </td>
           <td *ngIf="isAccountView">
             <div
-              class="flex align-items-center justify-content-center gap-2"
-              *ngIf="!rowData.isGroup && !rowData.isTotal"
+              class="flex align-items-center gap-2"
+              *ngIf="
+                !rowData.isGroup &&
+                !rowData.isTotal &&
+                rowData.isLocked === 'FALSE'
+              "
             >
               <button
                 *ngIf="!rowData.isEditing"
@@ -207,6 +211,15 @@
                 class="p-button-rounded p-button-text p-button-danger row-action-button"
                 (click)="confirmDeleteHolding($event, rowData.holdingCode)"
               ></button>
+            </div>
+            <div
+              *ngIf="
+                !rowData.isGroup &&
+                !rowData.isTotal &&
+                rowData.isLocked === 'TRUE'
+              "
+            >
+              <span class="pi pi-lock text-primary"></span>
             </div>
           </td>
         </tr>
