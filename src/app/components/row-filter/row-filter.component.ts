@@ -16,18 +16,10 @@ export class RowFilterComponent implements OnInit {
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    const columnsGroup = this.formBuilder.group({});
-    for (const group of this.filterOptions) {
-      for (const child of group.children) {
-        columnsGroup.addControl(
-          child.key,
-          new FormControl({ value: false, disabled: false })
-        );
-      }
-    }
+    const optionsGroup = this.getDefaultOptionsGroup();
     this.formGroup = this.formBuilder.group({
       search: "",
-      columns: columnsGroup,
+      options: optionsGroup,
     });
     this.nodes = [...this.filterOptions];
     this.formGroup.controls["search"].valueChanges.subscribe((value) => {
@@ -41,8 +33,8 @@ export class RowFilterComponent implements OnInit {
         }))
         .filter((node) => node.children.length);
     });
-    this.formGroup.controls["columns"].valueChanges.subscribe((values) => {
-      this.onColumnsChange(
+    this.formGroup.controls["options"].valueChanges.subscribe((values) => {
+      this.onOptionsChange(
         Object.entries(values)
           .filter(([key, value]) => value)
           .map(([key]) => key)
@@ -50,22 +42,34 @@ export class RowFilterComponent implements OnInit {
     });
   }
 
+  getDefaultOptionsGroup() {
+    const optionsGroup = this.formBuilder.group({});
+    for (const group of this.filterOptions) {
+      for (const child of group.children) {
+        optionsGroup.addControl(
+          child.key,
+          new FormControl({ value: false, disabled: false })
+        );
+      }
+    }
+    return optionsGroup;
+  }
+
   resetToDefault() {
     this.nodes = [...this.filterOptions];
     this.formGroup.patchValue({
       search: "",
-      holdingName: true,
-      allocationP: true,
-      allocation: true,
-      price: true,
-      quantity: true,
-      marketValue: true,
-      portfolioPercent: true,
-      classPercent: true,
     });
+    const defaultValues = {};
+    for (const group of this.filterOptions) {
+      for (const child of group.children) {
+        defaultValues[child.key] = false;
+      }
+    }
+    this.formGroup.controls["options"].patchValue(defaultValues);
   }
 
-  onColumnsChange(filters: string[]) {
+  onOptionsChange(filters: string[]) {
     this.filterChangeEvent.emit(filters);
   }
 }

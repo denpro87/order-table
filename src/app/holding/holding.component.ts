@@ -113,6 +113,7 @@ export class HoldingComponent implements OnInit {
   ];
   selectedGrouping: DropDownOption;
   filterOptions: any[] = [];
+  currentFilters: string[] = [];
 
   constructor(private holdingService: HoldingService) {}
 
@@ -268,11 +269,9 @@ export class HoldingComponent implements OnInit {
   onGroupingChange(): void {
     this.expandedAll = false;
     if (this.selectedGrouping.label === "Account") {
-      this.currentArrayData = this.arrayData.athArrData;
       this.setAccountWithHoldingColumns();
       this.updateTreeTableData();
     } else {
-      this.currentArrayData = this.arrayData.htaArrData;
       this.setHoldingWithAccountColumns();
       this.updateTreeTableData();
     }
@@ -304,24 +303,7 @@ export class HoldingComponent implements OnInit {
     return isMatch;
   }
   onFilterChange(filters: string[]) {
-    const accountFilters = filters.filter((filter) =>
-      filter.includes("accountName")
-    );
-    const programTypeFilters = filters.filter((filter) =>
-      filter.includes("programType")
-    );
-    const accountTypeFilters = filters.filter(
-      (filter) =>
-        filter.includes("accountType") && !filter.includes("accountName")
-    );
-    this.currentArrayData = this.arrayData.athArrData.filter((row) => {
-      let isMatch = this.checkMatch(accountFilters, row);
-      if (!isMatch) return false;
-      isMatch = this.checkMatch(programTypeFilters, row);
-      if (!isMatch) return false;
-      isMatch = this.checkMatch(accountTypeFilters, row);
-      return isMatch;
-    });
+    this.currentFilters = filters;
     this.updateTreeTableData();
   }
 
@@ -446,10 +428,40 @@ export class HoldingComponent implements OnInit {
     ];
     return data;
   }
+
   updateTreeTableData(): void {
+    const accountFilters = this.currentFilters.filter((filter) =>
+      filter.includes("accountName")
+    );
+    const programTypeFilters = this.currentFilters.filter((filter) =>
+      filter.includes("programType")
+    );
+    const accountTypeFilters = this.currentFilters.filter(
+      (filter) =>
+        filter.includes("accountType") && !filter.includes("accountName")
+    );
     if (this.selectedGrouping.label === "Account") {
+      this.currentArrayData = this.arrayData.athArrData.filter((row) => {
+        let isMatch = this.checkMatch(accountFilters, row);
+        if (!isMatch) return false;
+        isMatch = this.checkMatch(programTypeFilters, row);
+        if (!isMatch) return false;
+        isMatch = this.checkMatch(accountTypeFilters, row);
+        return isMatch;
+      });
       this.treeTableData = this.accountGroupingData(this.currentArrayData);
     } else {
+      this.currentArrayData = this.arrayData.htaArrData.map((row) => ({
+        ...row,
+        accounts: row.accounts.filter((account) => {
+          let isMatch = this.checkMatch(accountFilters, account);
+          if (!isMatch) return false;
+          isMatch = this.checkMatch(programTypeFilters, account);
+          if (!isMatch) return false;
+          isMatch = this.checkMatch(accountTypeFilters, account);
+          return isMatch;
+        }),
+      }));
       this.treeTableData = this.holdingGroupingData(this.currentArrayData, 0);
     }
     console.log("threeTableData=====>", this.treeTableData);
