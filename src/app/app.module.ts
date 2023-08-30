@@ -103,6 +103,7 @@ import { HoldingService } from "src/service/holdingService";
 import { AccountTableComponent } from "./components/account-table/account-table.component";
 import { ColumnFilterComponent } from "./components/column-filter/column-filter.component";
 import { RowFilterComponent } from "./components/row-filter/row-filter.component";
+import { EditAccountComponent } from './edit-account/edit-account.component';
 
 @NgModule({
   imports: [
@@ -208,6 +209,7 @@ import { RowFilterComponent } from "./components/row-filter/row-filter.component
     AccountTableComponent,
     ColumnFilterComponent,
     RowFilterComponent,
+    EditAccountComponent,
   ],
   bootstrap: [AppComponent],
   providers: [CustomerService, HoldingService],
