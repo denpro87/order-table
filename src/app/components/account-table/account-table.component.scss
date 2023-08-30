@@ -1,12 +1,25 @@
 :host ::ng-deep {
   .account-table .p-datatable {
+    border: 1px solid #dee2e6;
     .p-button.p-button-icon-only {
       width: 20px;
       height: fit-content;
       padding: 0;
     }
-    tr th {
-      height: 48px;
+    th,
+    td {
+      padding: 0.625rem 1rem;
+      .pi {
+        font-size: 12px;
+      }
+    }
+    th {
+      background: #f2f3f3;
+    }
+    tr:last-child {
+      td {
+        border-bottom: none;
+      }
     }
   }
 }

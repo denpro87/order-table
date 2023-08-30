@@ -12,27 +12,16 @@ export class AccountTableComponent implements OnInit {
   clonedAccount: { [s: string]: Account } = {};
 
   accountCols!: Column[];
-  accountScrollableCols!: Column[];
-  accountFrozenCols!: Column[];
 
   constructor() {}
 
   ngOnInit() {
-    this.accountFrozenCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-    ];
     this.accountCols = [
-      { field: "accountName", header: "Name", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "accountName", header: "Account", filterType: "text" },
+      { field: "accountId", header: "Account No.", filterType: "text" },
       { field: "accountType", header: "Account Type", filterType: "text" },
       { field: "programType", header: "Program Type", filterType: "text" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
-    ];
-
-    this.accountScrollableCols = [
       { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "accountType", header: "Account Type", filterType: "text" },
-      { field: "programType", header: "Program Type", filterType: "text" },
       { field: "allocation", header: "Allocation", filterType: "numeric" },
     ];
   }
