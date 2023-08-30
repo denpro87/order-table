@@ -52,13 +52,14 @@ export class HoldingComponent implements OnInit {
   selectedColumns!: Column[];
   selectedColumnsKeys = [
     "holdingName",
-    "allocationP",
+    "allocationPercent",
     "allocation",
     "price",
     "quantity",
     "marketValue",
     "portfolioPercent",
-    "classPercent",
+    "assetClassPercent",
+    "minPurchase",
   ];
 
   showError: boolean = false;
@@ -222,8 +223,33 @@ export class HoldingComponent implements OnInit {
         filterType: "numeric",
       },
       {
+        field: "allocationPercent",
+        header: "Alloc. %",
+        filterType: "numeric",
+      },
+      {
         field: "allocation",
         header: "Alloc. $",
+        filterType: "numeric",
+      },
+      {
+        field: "minPurchase",
+        header: "Min. $",
+        filterType: "numeric",
+      },
+      {
+        field: "estimatedAnnualDistribution",
+        header: "Estimated Annual Distribution",
+        filterType: "numeric",
+      },
+      {
+        field: "yieldMaturity",
+        header: "Yield Maturity",
+        filterType: "numeric",
+      },
+      {
+        field: "currentYield",
+        header: "Current Yield",
         filterType: "numeric",
       },
     ];

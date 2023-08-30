@@ -26,7 +26,7 @@ export class ColumnFilterComponent {
       label: "Cost & Market Value Data",
       children: [
         {
-          key: "allocationP",
+          key: "allocationPercent",
           label: "Allocation (%)",
         },
         {
@@ -49,6 +49,24 @@ export class ColumnFilterComponent {
     },
     {
       key: "2",
+      label: "Income & Yield Data",
+      children: [
+        {
+          key: "estimatedAnnualDistribution",
+          label: "Estimated Annual Distribution",
+        },
+        {
+          key: "yieldMaturity",
+          label: "Yield Maturity",
+        },
+        {
+          key: "currentYield",
+          label: "Current Yield",
+        },
+      ],
+    },
+    {
+      key: "3",
       label: "Additional Data",
       children: [
         {
@@ -56,8 +74,12 @@ export class ColumnFilterComponent {
           label: "% of portfolio",
         },
         {
-          key: "classPercent",
+          key: "assetClassPercent",
           label: "% of class",
+        },
+        {
+          key: "minPurchase",
+          label: "Min. $",
         },
       ],
     },
@@ -70,13 +92,17 @@ export class ColumnFilterComponent {
       search: "",
       columns: this.formBuilder.group({
         holdingName: new FormControl({ value: true, disabled: true }),
-        allocationP: new FormControl({ value: true, disabled: true }),
+        allocationPercent: new FormControl({ value: true, disabled: true }),
         allocation: new FormControl({ value: true, disabled: true }),
         price: true,
         quantity: true,
         marketValue: true,
+        estimatedAnnualDistribution: false,
+        yieldMaturity: false,
+        currentYield: false,
         portfolioPercent: true,
-        classPercent: true,
+        assetClassPercent: true,
+        minPurchase: true,
       }),
     });
     this.nodes = [...this.defaultNodes];
@@ -111,12 +137,12 @@ export class ColumnFilterComponent {
       quantity: true,
       marketValue: true,
       portfolioPercent: true,
-      classPercent: true,
+      assetClassPercent: true,
     });
   }
 
   onColumnsChange(columns: string[]) {
-    const defaultColumns = ["holdingName", "allocationP", "allocation"];
+    const defaultColumns = ["holdingName", "allocationPercent", "allocation"];
     this.columnsChangeEvent.emit([...defaultColumns, ...columns]);
   }
 }
