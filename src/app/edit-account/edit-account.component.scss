@@ -1,0 +1,18 @@
+:host ::ng-deep {
+  .p-treetable {
+    .p-treetable-tbody {
+      > tr.group {
+        background: #fafafa;
+        color: #579cd7;
+      }
+      > tr.total {
+        background: #f2f3f3;
+      }
+    }
+    .p-button.p-button-icon-only.row-action-button {
+      width: 20px;
+      height: fit-content;
+      padding: 0;
+    }
+  }
+}
