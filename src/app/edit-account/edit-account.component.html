@@ -37,6 +37,14 @@
             ></button>
           </div>
         </div>
+        <p-divider *ngIf="selectedHoldings.length"></p-divider>
+        <p-button
+          label="Delete"
+          icon="pi pi-trash"
+          styleClass="p-button-text"
+          *ngIf="selectedHoldings.length"
+          (click)="deleteAll()"
+        ></p-button>
       </ng-template>
       <ng-template pTemplate="header" let-columns>
         <tr>
@@ -49,8 +57,18 @@
               width: i === 0 ? '450px' : 'fit-content'
             }"
           >
-            {{ col.header }}
-            <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+            <div class="flex align-items-center gap-2">
+              <p-checkbox
+                *ngIf="i === 0"
+                [(ngModel)]="isSelectAll"
+                [binary]="true"
+                (click)="handleSelectAll($event)"
+              ></p-checkbox>
+              <div>
+                {{ col.header }}
+                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+              </div>
+            </div>
           </th>
           <th></th>
         </tr>
@@ -73,15 +91,18 @@
                 [rowNode]="rowNode"
                 *ngIf="col.field === 'holdingName'"
               ></p-treeTableToggler>
+              <p-checkbox
+                *ngIf="i === 0 && !rowData.isGroup && !rowData.isTotal"
+                [(ngModel)]="rowData.isSelected"
+                [binary]="true"
+                (click)="handleSelectRow($event, rowData)"
+              ></p-checkbox>
               <div
-                class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
+                class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap ml-2"
                 [ngClass]="{ 'font-bold': rowData.isTotal }"
               >
-                <input
-                  pInputText
-                  type="number"
+                <span
                   class="w-full"
-                  [(ngModel)]="rowData[col.field]"
                   *ngIf="
                     rowData.isEditing &&
                       (col.field === 'quantity' ||
@@ -89,7 +110,22 @@
                         col.field === 'allocation');
                     else output
                   "
-                />
+                >
+                  <!-- <i
+                    class="pi pi-percentage"
+                    *ngIf="col.field === 'allocationPercent'"
+                  ></i>
+                  <i
+                    class="pi pi-dollar"
+                    *ngIf="col.field === 'allocation'"
+                  ></i> -->
+                  <input
+                    pInputText
+                    type="number"
+                    class="w-full"
+                    [(ngModel)]="rowData[col.field]"
+                  />
+                </span>
                 <ng-template #output>
                   {{ rowData[col.field] }}
                 </ng-template>

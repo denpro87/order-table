@@ -59,6 +59,9 @@ export class EditAccountComponent implements OnInit {
   filterOptions: any[] = [];
   currentFilters: string[] = [];
 
+  isSelectAll = false;
+  selectedHoldings: string[] = [];
+
   constructor(
     private holdingService: HoldingService,
     private confirmationService: ConfirmationService
@@ -73,6 +76,7 @@ export class EditAccountComponent implements OnInit {
       this.updateTreeTableData();
     });
   }
+
   setColumns() {
     this.selectedColumns = [...this.cols].filter((col) =>
       this.selectedColumnsKeys.includes(col.field)
@@ -319,5 +323,42 @@ export class EditAccountComponent implements OnInit {
       ),
     }));
     delete this.clonedHolding[holding.holdingCode];
+  }
+
+  deleteAll() {
+    console.log(this.selectedHoldings);
+  }
+
+  handleSelectAll(event) {
+    event.stopPropagation();
+    const clonedData = [...this.treeTableData];
+    const selectedHoldings = [];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.map((child) => {
+        if (this.isSelectAll) {
+          selectedHoldings.push(child.data.holdingCode);
+        }
+        return {
+          ...child,
+          data: { ...child.data, isSelected: this.isSelectAll },
+        };
+      }),
+    }));
+    this.selectedHoldings = selectedHoldings;
+  }
+
+  handleSelectRow(event, holding: any) {
+    event.stopPropagation();
+    if (holding.isSelected) {
+      this.selectedHoldings = [...this.selectedHoldings, holding.holdingCode];
+    } else {
+      this.selectedHoldings = this.selectedHoldings.filter(
+        (item) => item !== holding.holdingCode
+      );
+    }
+    if (this.selectedHoldings.length < 1) {
+      this.isSelectAll = false;
+    }
   }
 }
