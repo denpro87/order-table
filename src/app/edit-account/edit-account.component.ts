@@ -7,7 +7,7 @@ import {
   animate,
 } from "@angular/animations";
 import * as FileSaver from "file-saver";
-import { MessageService, TreeNode, ConfirmationService } from "primeng/api";
+import { MessageService, ConfirmationService } from "primeng/api";
 
 import { AccountWithHolding, Column, Holding } from "../../types";
 import { HoldingService } from "src/service/holdingService";
@@ -61,6 +61,8 @@ export class EditAccountComponent implements OnInit {
 
   isSelectAll = false;
   selectedHoldings: string[] = [];
+
+  cash = 100000;
 
   constructor(
     private holdingService: HoldingService,
@@ -130,24 +132,6 @@ export class EditAccountComponent implements OnInit {
       data,
       fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
     );
-  }
-
-  private expandRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand;
-    if (node.children) {
-      node.children.forEach((childNode) => {
-        this.expandRecursive(childNode, isExpand);
-      });
-    }
-  }
-
-  handleExpandRows() {
-    this.expandedAll = !this.expandedAll;
-    const cloneData = [...this.treeTableData];
-    cloneData.forEach((node) => {
-      this.expandRecursive(node, this.expandedAll);
-    });
-    this.treeTableData = cloneData;
   }
 
   onColumnsChange(columns: string[]) {
@@ -361,4 +345,19 @@ export class EditAccountComponent implements OnInit {
       this.isSelectAll = false;
     }
   }
+
+  // updateHolding() {
+  //   let totalValue = this.cash + this.stocks.reduce((acc, stock) => acc +
+  //  stock.dollar, 0);
+  //   this.stocks.forEach(stock => {
+  //   stock.percent = stock.dollar / totalValue;
+  //   stock.units = Math.round(stock.dollar / stock.price);
+  //   if (stock.units * stock.price < stock.minPurchase) {
+  //   stock.units = Math.ceil(stock.minPurchase / stock.price);
+  //   stock.dollar = stock.units * stock.price;
+  //   stock.percent = stock.dollar / totalValue;
+  //   }
+  //   this.cash -= stock.dollar;
+  //   });
+  //   }
 }

@@ -26,6 +26,7 @@ export interface Account {
   programType: string;
   quantity: number;
   allocation: number;
+  allocationPercent: number;
 }
 
 export interface AccountWithHolding {
