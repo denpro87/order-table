@@ -32,8 +32,6 @@ import { HoldingService } from "src/service/holdingService";
 export class EditAccountComponent implements OnInit {
   athArrData!: AccountWithHolding[];
 
-  clonedHolding: { [s: string]: Holding } = {};
-
   loading: boolean = true;
 
   cols!: Column[];
@@ -51,31 +49,31 @@ export class EditAccountComponent implements OnInit {
   ];
 
   showError: boolean = false;
-  expandedAll: boolean = false;
 
   treeTableData: any[] = [];
 
-  selectedGrouping = "accountType";
-  filterOptions: any[] = [];
-  currentFilters: string[] = [];
+  selectedGrouping = "assetClass";
 
   isSelectAll = false;
-  selectedHoldings: string[] = [];
+  selectedHoldings: number[] = [];
 
   cash = 100000;
-
+  holdings: Holding[] = [];
+  currentAccount!: AccountWithHolding;
   constructor(
     private holdingService: HoldingService,
     private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
+    this.setAccountWithHoldingColumns();
     this.holdingService.getHoldingData().then((arrayData) => {
       console.log(arrayData);
       this.loading = false;
       this.athArrData = arrayData.athArrData;
-      this.setAccountWithHoldingColumns();
-      this.updateTreeTableData();
+      this.currentAccount = this.athArrData[0];
+      this.holdings = this.currentAccount.holdings;
+      this.updateHoldings();
     });
   }
 
@@ -111,7 +109,7 @@ export class EditAccountComponent implements OnInit {
 
   exportExcel() {
     import("xlsx").then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(this.athArrData);
+      const worksheet = xlsx.utils.json_to_sheet(this.holdings);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
       const excelBuffer: any = xlsx.write(workbook, {
         bookType: "xlsx",
@@ -134,30 +132,14 @@ export class EditAccountComponent implements OnInit {
     );
   }
 
+  onAccountChange() {
+    this.holdings = this.currentAccount.holdings;
+    this.updateHoldings();
+  }
+
   onColumnsChange(columns: string[]) {
     this.selectedColumnsKeys = columns;
     this.setColumns();
-  }
-
-  checkMatch(filters, row) {
-    let isMatch = filters.length === 0;
-    for (const filter of filters) {
-      const [keysString, value] = filter.split(", ");
-      const keys = keysString.split(" - ");
-      const values = value.split(" - ");
-      if (keys.length > 1) {
-        if (values[0] === row[keys[0]] && values[1] === row[keys[1]]) {
-          isMatch = true;
-          break;
-        }
-      } else {
-        if (value === row[keysString]) {
-          isMatch = true;
-          break;
-        }
-      }
-    }
-    return isMatch;
   }
 
   getGroupingViaProperty(list, keysString) {
@@ -177,41 +159,34 @@ export class EditAccountComponent implements OnInit {
     return Object.keys(groupingViaCommonProperty);
   }
 
-  accountGroupingData(list) {
-    const keysString = this.selectedGrouping;
-    const keys = keysString.split(" - ");
+  holdingGroupingData(list) {
+    const key = this.selectedGrouping;
     const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
       (acc, current) => {
-        const key =
-          keys.length > 1
-            ? `${current[keys[0]]} - ${current[keys[1]]}`
-            : current[keysString];
-        acc[key] = acc[key] ?? [];
-        acc[key].push(current);
+        acc[current[key]] = acc[current[key]] ?? [];
+        acc[current[key]].push(current);
         return acc;
       },
       {}
     );
-
-    const accountData = Object.entries(groupingViaCommonProperty).map(
+    const holdingData = Object.entries(groupingViaCommonProperty).map(
       ([group, value]) => ({
+        expanded: true,
         data: {
           holdingName: `${group} (${value.length})`,
           allocation: value.reduce((accumulator, object) => {
-            return (
-              accumulator +
-              Number(
-                object.holdings.reduce((accumulator, holdingObject) => {
-                  return accumulator + Number(holdingObject.allocation || "0");
-                }, 0) || "0"
-              )
-            );
+            return accumulator + Number(object.allocation);
+          }, 0),
+          allocationPercent: value.reduce((accumulator, object) => {
+            return accumulator + Number(object.allocationPercent);
           }, 0),
           isGroup: true,
         },
-        children: value[0].holdings.map((item) => ({
-          data: item,
-        })),
+        children: value.map((item) => {
+          return {
+            data: item,
+          };
+        }),
       })
     );
     const data = [
@@ -220,97 +195,61 @@ export class EditAccountComponent implements OnInit {
           holdingName: "Total",
           allocation:
             Math.round(
-              accountData.reduce((accumulator, object) => {
+              holdingData.reduce((accumulator, object) => {
                 return accumulator + object.data.allocation;
+              }, 0) * 100
+            ) / 100,
+          allocationPercent:
+            Math.round(
+              holdingData.reduce((accumulator, object) => {
+                return accumulator + object.data.allocationPercent;
               }, 0) * 100
             ) / 100,
           isTotal: true,
         },
       },
-      ...accountData,
+      ...holdingData,
     ];
     return data;
   }
 
   updateTreeTableData(): void {
-    this.treeTableData = this.accountGroupingData(this.athArrData);
+    this.treeTableData = this.holdingGroupingData(this.holdings);
     console.log("threeTableData=====>", this.treeTableData);
   }
 
-  confirmDeleteHolding(event: Event, holdingCode: string) {
+  confirmDeleteHolding(event: Event, holdingId: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: "Are you sure that you want to proceed?",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.deleteHolding(holdingCode);
+        this.deleteHolding(holdingId);
+        this.updateHoldings();
       },
     });
   }
 
-  deleteHolding(holdingCode: string) {
-    const clonedData = [...this.treeTableData];
-    this.treeTableData = clonedData.map((group) => ({
-      ...group,
-      children: group.children?.filter(
-        (child) => child.data.holdingCode !== holdingCode
-      ),
-    }));
+  deleteHolding(holdingId: number) {
+    const index = this.holdings.findIndex(
+      (holding) => holding.holdingId === holdingId
+    );
+    this.cash += this.holdings[index].allocation;
+    this.holdings.splice(index, 1);
   }
 
-  onHoldingRowEditInit(holding: Holding) {
-    this.clonedHolding[holding.holdingCode] = { ...holding };
-    const clonedData = [...this.treeTableData];
-    this.treeTableData = clonedData.map((group) => ({
-      ...group,
-      children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
-          ? {
-              ...child,
-              data: { ...child.data, isEditing: true },
-            }
-          : child
-      ),
-    }));
-  }
-
-  onHoldingRowEditSave(holding: Holding) {
-    const clonedData = [...this.treeTableData];
-    this.treeTableData = clonedData.map((group) => ({
-      ...group,
-      children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
-          ? {
-              ...child,
-              data: { ...child.data, isEditing: false },
-            }
-          : child
-      ),
-    }));
-    delete this.clonedHolding[holding.holdingCode];
-  }
-
-  onHoldingRowEditCancel(holding: Holding) {
-    const clonedData = [...this.treeTableData];
-    this.treeTableData = clonedData.map((group) => ({
-      ...group,
-      children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
-          ? {
-              ...child,
-              data: {
-                ...this.clonedHolding[holding.holdingCode],
-                isEditing: false,
-              },
-            }
-          : child
-      ),
-    }));
-    delete this.clonedHolding[holding.holdingCode];
-  }
-
-  deleteAll() {
-    console.log(this.selectedHoldings);
+  deleteAll(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: "Are you sure that you want to proceed?",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        for (const holdingId of this.selectedHoldings) {
+          this.deleteHolding(holdingId);
+        }
+        this.updateHoldings();
+      },
+    });
   }
 
   handleSelectAll(event) {
@@ -321,7 +260,7 @@ export class EditAccountComponent implements OnInit {
       ...group,
       children: group.children?.map((child) => {
         if (this.isSelectAll) {
-          selectedHoldings.push(child.data.holdingCode);
+          selectedHoldings.push(child.data.holdingId);
         }
         return {
           ...child,
@@ -335,10 +274,10 @@ export class EditAccountComponent implements OnInit {
   handleSelectRow(event, holding: any) {
     event.stopPropagation();
     if (holding.isSelected) {
-      this.selectedHoldings = [...this.selectedHoldings, holding.holdingCode];
+      this.selectedHoldings = [...this.selectedHoldings, holding.holdingId];
     } else {
       this.selectedHoldings = this.selectedHoldings.filter(
-        (item) => item !== holding.holdingCode
+        (item) => item !== holding.holdingId
       );
     }
     if (this.selectedHoldings.length < 1) {
@@ -346,18 +285,59 @@ export class EditAccountComponent implements OnInit {
     }
   }
 
-  // updateHolding() {
-  //   let totalValue = this.cash + this.stocks.reduce((acc, stock) => acc +
-  //  stock.dollar, 0);
-  //   this.stocks.forEach(stock => {
-  //   stock.percent = stock.dollar / totalValue;
-  //   stock.units = Math.round(stock.dollar / stock.price);
-  //   if (stock.units * stock.price < stock.minPurchase) {
-  //   stock.units = Math.ceil(stock.minPurchase / stock.price);
-  //   stock.dollar = stock.units * stock.price;
-  //   stock.percent = stock.dollar / totalValue;
-  //   }
-  //   this.cash -= stock.dollar;
-  //   });
-  //   }
+  updateHoldings() {
+    const totalValue = 100000;
+    let initialCash = totalValue;
+    this.holdings.forEach((holding) => {
+      holding.quantity = Math.round(holding.allocation / holding.price);
+      if (holding.quantity * holding.price < holding.minPurchase) {
+        holding.quantity = Math.ceil(holding.minPurchase / holding.price);
+        holding.allocation = holding.quantity * holding.price;
+      }
+      holding.allocationPercent = (holding.allocation / totalValue) * 100;
+      initialCash -= holding.allocation;
+    });
+    this.cash = initialCash;
+    this.updateTreeTableData();
+  }
+
+  updateByQuantity(holdingId, quantity) {
+    const index = this.holdings.findIndex(
+      (holding) => holding.holdingId === holdingId
+    );
+    let holding = this.holdings[index];
+    if (quantity * holding.price < holding.minPurchase) {
+      quantity = Math.ceil(holding.minPurchase / holding.price);
+    }
+    this.cash += holding.allocation;
+    holding.quantity = quantity;
+    holding.allocation = quantity * holding.price;
+    this.updateHoldings();
+  }
+
+  updateByPercent(holdingId, percent) {
+    const index = this.holdings.findIndex(
+      (holding) => holding.holdingId === holdingId
+    );
+    let totalValue =
+      this.cash +
+      this.holdings.reduce((acc, holding) => acc + holding.allocation, 0);
+    this.cash += this.holdings[index].allocation;
+    this.holdings[index].allocationPercent = percent;
+    this.holdings[index].allocation = (percent * totalValue) / 100;
+    this.updateHoldings();
+  }
+
+  updateByAllocation(holdingId, allocation) {
+    const index = this.holdings.findIndex(
+      (holding) => holding.holdingId === holdingId
+    );
+    let holding = this.holdings[index];
+    if (allocation < holding.minPurchase) {
+      allocation = holding.minPurchase;
+    }
+    this.cash += holding.allocation;
+    this.holdings[index].allocation = allocation;
+    this.updateHoldings();
+  }
 }

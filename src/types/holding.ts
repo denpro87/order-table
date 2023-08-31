@@ -26,7 +26,6 @@ export interface Account {
   programType: string;
   quantity: number;
   allocation: number;
-  allocationPercent: number;
 }
 
 export interface AccountWithHolding {
@@ -43,6 +42,7 @@ export interface Holding {
   holdingName: string;
   holdingCode: string;
   holdingType: string;
+  holdingId: number;
   assetClass: string;
   subAssetClass: string;
   sourceOfInvestment: string;
@@ -56,4 +56,6 @@ export interface Holding {
   portfolioManger: string;
   quantity: number;
   allocation: number;
+  allocationPercent: number;
+  minPurchase: number;
 }
