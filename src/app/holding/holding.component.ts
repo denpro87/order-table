@@ -455,7 +455,7 @@ export class HoldingComponent implements OnInit {
     const accountData = Object.entries(groupingViaCommonProperty).map(
       ([group, value]) => ({
         data: {
-          holdingName: `${value[0].accountName} (${value[0].accountId}) ${group}`,
+          holdingName: `${value[0].accountName} (${value[0].accountId}) - ${value[0].accountType}`,
           marketValue: value.reduce((accumulator, object) => {
             return (
               accumulator +
