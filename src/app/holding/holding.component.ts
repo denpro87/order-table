@@ -590,9 +590,9 @@ export class HoldingComponent implements OnInit {
 
   handleHoldingChange(holding: Holding, key) {
     const clonedData = [...this.treeTableData];
-    this.treeTableData = clonedData.map((group) => ({
-      ...group,
-      children: group.children?.map((child) => {
+    let totalMarketValue = 0;
+    this.treeTableData = clonedData.map((group) => {
+      const children = group.children?.map((child) => {
         if (child.data.holdingId === holding.holdingId) {
           const totalValue = 100000;
           let quantity = holding.quantity;
@@ -614,14 +614,39 @@ export class HoldingComponent implements OnInit {
             allocation = (allocationPercent * totalValue) / 100;
             quantity = Math.round(allocation / holding.price);
           }
+          totalMarketValue += allocation;
 
           return {
             ...child,
-            data: { ...child.data, quantity, allocation, allocationPercent },
+            data: {
+              ...child.data,
+              quantity,
+              allocation,
+              allocationPercent,
+              marketValue: allocation,
+            },
           };
         }
+
+        totalMarketValue += child.data.marketValue;
         return child;
-      }),
-    }));
+      });
+      return {
+        ...group,
+        children,
+        data: {
+          ...group.data,
+          marketValue: children
+            ? Math.round(
+                children?.reduce((accumulator, object) => {
+                  return accumulator + object.data.marketValue;
+                }, 0) * 100
+              ) / 100
+            : group.data.marketValue,
+        },
+      };
+    });
+    this.treeTableData[0].data.marketValue =
+      Math.round(totalMarketValue * 100) / 100;
   }
 }

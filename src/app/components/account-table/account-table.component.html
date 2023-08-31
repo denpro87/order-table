@@ -50,6 +50,7 @@
                 pInputText
                 type="number"
                 [(ngModel)]="account.quantity"
+                (change)="handleHoldingChange(account, ri, 'quantity')"
               />
             </ng-template>
             <ng-template pTemplate="output">
@@ -65,6 +66,7 @@
                 pInputText
                 type="number"
                 [(ngModel)]="account.allocationPercent"
+                (change)="handleHoldingChange(account, ri, 'allocationPercent')"
               />
             </ng-template>
             <ng-template pTemplate="output">
@@ -80,6 +82,7 @@
                 pInputText
                 type="number"
                 [(ngModel)]="account.allocation"
+                (change)="handleHoldingChange(account, ri, 'allocation')"
               />
             </ng-template>
             <ng-template pTemplate="output">

@@ -46,4 +46,35 @@ export class AccountTableComponent implements OnInit {
     this.accounts[index] = this.clonedAccount[account.accountId as string];
     delete this.clonedAccount[account.accountId as string];
   }
+
+  handleHoldingChange(account, index, key) {
+    console.log(account);
+    const totalValue = 100000;
+    let quantity = account.quantity;
+    let allocation = account.allocation;
+    let allocationPercent = account.allocationPercent;
+    if (key === "quantity") {
+      if (quantity * account.price < account.minPurchase) {
+        quantity = Math.ceil(account.minPurchase / account.price);
+      }
+      allocation = quantity * account.price;
+      allocationPercent = (allocation / totalValue) * 100;
+    } else if (key === "allocation") {
+      if (allocation < account.minPurchase) {
+        allocation = account.minPurchase;
+      }
+      quantity = Math.round(allocation / account.price);
+      allocationPercent = (allocation / totalValue) * 100;
+    } else if (key === "allocationPercent") {
+      allocation = (allocationPercent * totalValue) / 100;
+      quantity = Math.round(allocation / account.price);
+    }
+    this.accounts[index] = {
+      ...this.accounts[index],
+      quantity,
+      allocation,
+      allocationPercent,
+      marketValue: allocation,
+    };
+  }
 }
