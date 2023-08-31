@@ -44,7 +44,7 @@ export class HoldingComponent implements OnInit {
   currentArrayData: any[];
 
   accounts!: Account[];
-  clonedHolding: { [s: string]: Holding } = {};
+  clonedHolding: { [s: number]: Holding } = {};
 
   loading: boolean = true;
 
@@ -502,7 +502,7 @@ export class HoldingComponent implements OnInit {
       (filter) =>
         filter.includes("accountType") && !filter.includes("accountName")
     );
-    if (this.selectedGrouping.label === "Account") {
+    if (this.isAccountView) {
       this.currentArrayData = this.arrayData.athArrData.filter((row) => {
         let isMatch = this.checkMatch(accountFilters, row);
         if (!isMatch) return false;
@@ -529,34 +529,34 @@ export class HoldingComponent implements OnInit {
     console.log("threeTableData=====>", this.treeTableData);
   }
 
-  confirmDeleteHolding(event: Event, holdingCode: string) {
+  confirmDeleteHolding(event: Event, holdingId: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: "Are you sure that you want to proceed?",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.deleteHolding(holdingCode);
+        this.deleteHolding(holdingId);
       },
     });
   }
 
-  deleteHolding(holdingCode: string) {
+  deleteHolding(holdingId: number) {
     const clonedData = [...this.treeTableData];
     this.treeTableData = clonedData.map((group) => ({
       ...group,
       children: group.children?.filter(
-        (child) => child.data.holdingCode !== holdingCode
+        (child) => child.data.holdingId !== holdingId
       ),
     }));
   }
 
   onHoldingRowEditInit(holding: Holding) {
-    this.clonedHolding[holding.holdingCode] = { ...holding };
+    this.clonedHolding[holding.holdingId] = { ...holding };
     const clonedData = [...this.treeTableData];
     this.treeTableData = clonedData.map((group) => ({
       ...group,
       children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
+        child.data.holdingId === holding.holdingId
           ? {
               ...child,
               data: { ...child.data, isEditing: true },
@@ -571,7 +571,7 @@ export class HoldingComponent implements OnInit {
     this.treeTableData = clonedData.map((group) => ({
       ...group,
       children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
+        child.data.holdingId === holding.holdingId
           ? {
               ...child,
               data: { ...child.data, isEditing: false },
@@ -579,7 +579,7 @@ export class HoldingComponent implements OnInit {
           : child
       ),
     }));
-    delete this.clonedHolding[holding.holdingCode];
+    delete this.clonedHolding[holding.holdingId];
   }
 
   onHoldingRowEditCancel(holding: Holding) {
@@ -587,17 +587,17 @@ export class HoldingComponent implements OnInit {
     this.treeTableData = clonedData.map((group) => ({
       ...group,
       children: group.children?.map((child) =>
-        child.data.holdingCode === holding.holdingCode
+        child.data.holdingId === holding.holdingId
           ? {
               ...child,
               data: {
-                ...this.clonedHolding[holding.holdingCode],
+                ...this.clonedHolding[holding.holdingId],
                 isEditing: false,
               },
             }
           : child
       ),
     }));
-    delete this.clonedHolding[holding.holdingCode];
+    delete this.clonedHolding[holding.holdingId];
   }
 }
