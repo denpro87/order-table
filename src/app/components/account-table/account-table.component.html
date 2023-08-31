@@ -37,17 +37,58 @@
           {{ account.programType }}
         </td>
         <td>
-          {{ account.quantity }}
+          {{ account.sourceOfInvestment }}
+        </td>
+        <td>
+          {{ account.marketValue }}
         </td>
         <td>
           <p-cellEditor>
             <ng-template pTemplate="input">
-              <input pInputText type="text" [(ngModel)]="account.allocation" />
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.quantity"
+              />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.quantity }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.allocationPercent"
+              />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.allocationPercent }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.allocation"
+              />
             </ng-template>
             <ng-template pTemplate="output">
               {{ account.allocation }}
             </ng-template>
           </p-cellEditor>
+        </td>
+        <td>
+          {{ account.minPurchase }}
         </td>
         <td>
           <div class="flex align-items-center justify-content-center gap-2">
@@ -70,7 +111,7 @@
               pSaveEditableRow
               icon="pi pi-check"
               styleClass="p-button-sm"
-              (click)="onccountRowEditSave(account)"
+              (click)="onAccountRowEditSave(account)"
               class="p-button-rounded p-button-text p-button-success mr-2"
             ></button>
             <button
@@ -92,7 +133,7 @@
               styleClass="p-button-sm"
               icon="pi pi-trash"
               class="p-button-rounded p-button-text p-button-danger"
-              (click)="deleteccount(account.accountId)"
+              (click)="deleteAccount(account.accountId)"
             ></button>
           </div>
         </td>

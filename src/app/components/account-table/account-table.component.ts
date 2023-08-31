@@ -21,8 +21,12 @@ export class AccountTableComponent implements OnInit {
       { field: "accountId", header: "Account No.", filterType: "text" },
       { field: "accountType", header: "Account Type", filterType: "text" },
       { field: "programType", header: "Program Type", filterType: "text" },
+      { field: "sourceOfInvestment", header: "Source", filterType: "text" },
+      { field: "marketValue", header: "Mkt.Value $", filterType: "numeric" },
       { field: "quantity", header: "Qty", filterType: "numeric" },
-      { field: "allocation", header: "Allocation", filterType: "numeric" },
+      { field: "allocationPercent", header: "Alloc. %", filterType: "numeric" },
+      { field: "allocation", header: "Alloc. $", filterType: "numeric" },
+      { field: "minPurchase", header: "Min. $", filterType: "numeric" },
     ];
   }
 
