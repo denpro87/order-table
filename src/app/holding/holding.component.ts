@@ -453,25 +453,33 @@ export class HoldingComponent implements OnInit {
     );
 
     const accountData = Object.entries(groupingViaCommonProperty).map(
-      ([group, value]) => ({
-        data: {
-          holdingName: `${value[0].accountName} (${value[0].accountId}) - ${value[0].accountType}`,
-          marketValue: value.reduce((accumulator, object) => {
-            return (
-              accumulator +
-              Number(
-                object.holdings.reduce((accumulator, holdingObject) => {
-                  return accumulator + Number(holdingObject.marketValue || "0");
-                }, 0) || "0"
-              )
-            );
-          }, 0),
-          isGroup: true,
-        },
-        children: value[0].holdings.map((item) => ({
-          data: item,
-        })),
-      })
+      ([group, value]) => {
+        const marketValue = value.reduce((accumulator, object) => {
+          return (
+            accumulator +
+            Number(
+              object.holdings.reduce((accumulator, holdingObject) => {
+                return accumulator + Number(holdingObject.marketValue || "0");
+              }, 0) || "0"
+            )
+          );
+        }, 0);
+        return {
+          data: {
+            holdingName: `${value[0].accountName} (${value[0].accountId}) - ${value[0].accountType}`,
+            marketValue,
+            isGroup: true,
+          },
+          children: value[0].holdings.map((item) => ({
+            data: {
+              ...item,
+              assetClassPercent: item.marketValue
+                ? (item.marketValue / marketValue) * 100
+                : "",
+            },
+          })),
+        };
+      }
     );
     const data = [
       {
