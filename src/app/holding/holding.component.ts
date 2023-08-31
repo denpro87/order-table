@@ -191,7 +191,7 @@ export class HoldingComponent implements OnInit {
       { field: "holdingName", header: "Holdings", filterType: "text" },
       { field: "quantity", header: "Qty", filterType: "numeric" },
       { field: "price", header: "Price", filterType: "numeric" },
-      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+      { field: "marketValue", header: "Mkt.Value $", filterType: "numeric" },
       {
         field: "portfolioPercent",
         header: "% of Port",
@@ -202,6 +202,21 @@ export class HoldingComponent implements OnInit {
         header: "% of Class",
         filterType: "numeric",
       },
+      {
+        field: "estimatedAnnualDistribution",
+        header: "Estimated Annual Distribution",
+        filterType: "numeric",
+      },
+      {
+        field: "yieldMaturity",
+        header: "Yield Maturity",
+        filterType: "numeric",
+      },
+      {
+        field: "currentYield",
+        header: "Current Yield",
+        filterType: "numeric",
+      },
     ];
     this.setColumns();
   }
@@ -209,9 +224,9 @@ export class HoldingComponent implements OnInit {
   setAccountWithHoldingColumns() {
     this.cols = [
       { field: "holdingName", header: "Holdings", filterType: "text" },
-      { field: "quantity", header: "Qty", filterType: "numeric" },
+      { field: "marketValue", header: "Mkt.Value $", filterType: "numeric" },
       { field: "price", header: "Price", filterType: "numeric" },
-      { field: "marketValue", header: "Mkt.Value", filterType: "numeric" },
+      { field: "quantity", header: "Qty", filterType: "numeric" },
       {
         field: "portfolioPercent",
         header: "% of Port",
@@ -357,7 +372,7 @@ export class HoldingComponent implements OnInit {
     return Object.keys(groupingViaCommonProperty);
   }
 
-  holdingGroupingData(list, deep) {
+  holdingGroupingData(list, deep, parentMarketValue = 0) {
     const key = this.selectedGrouping.value[deep];
     const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
       (acc, current) => {
@@ -368,43 +383,57 @@ export class HoldingComponent implements OnInit {
       {}
     );
     const holdingData = Object.entries(groupingViaCommonProperty).map(
-      ([group, value]) => ({
-        data: {
-          holdingName: `${group} (${value.length})`,
-          marketValue: value.reduce((accumulator, object) => {
-            return accumulator + Number(object.marketValue);
-          }, 0),
-          isGroup: true,
-        },
-        children:
-          deep < this.selectedGrouping.value.length - 1
-            ? this.holdingGroupingData(value, deep + 1)
-            : value.map((item) => {
-                const itemData = { ...item };
-                delete itemData.accounts;
-                return {
-                  data: itemData,
-                  children: [{ data: { accounts: item["accounts"] } }],
-                };
-              }),
-      })
+      ([group, value]) => {
+        const marketValue = value.reduce((accumulator, object) => {
+          return accumulator + Number(object.marketValue);
+        }, 0);
+        return {
+          data: {
+            holdingName: `${group} (${value.length})`,
+            marketValue,
+            portfolioPercent: value.reduce((accumulator, object) => {
+              return accumulator + Number(object.portfolioPercent);
+            }, 0),
+            assetClassPercent:
+              deep === 0 ? 100 : (marketValue / parentMarketValue) * 100,
+            isGroup: true,
+          },
+          children:
+            deep < this.selectedGrouping.value.length - 1
+              ? this.holdingGroupingData(value, deep + 1, marketValue)
+              : value.map((item) => {
+                  const itemData = { ...item };
+                  delete itemData.accounts;
+                  return {
+                    data: {
+                      ...itemData,
+                      assetClassPercent: (item.marketValue / marketValue) * 100,
+                    },
+                    children: [{ data: { accounts: item["accounts"] } }],
+                  };
+                }),
+        };
+      }
     );
-    const data = [
-      {
-        data: {
-          holdingName: "Total",
-          marketValue:
-            Math.round(
-              holdingData.reduce((accumulator, object) => {
-                return accumulator + object.data.marketValue;
-              }, 0) * 100
-            ) / 100,
-          isTotal: true,
+    if (deep === 0) {
+      const data = [
+        {
+          data: {
+            holdingName: "Total",
+            marketValue:
+              Math.round(
+                holdingData.reduce((accumulator, object) => {
+                  return accumulator + object.data.marketValue;
+                }, 0) * 100
+              ) / 100,
+            isTotal: true,
+          },
         },
-      },
-      ...holdingData,
-    ];
-    return data;
+        ...holdingData,
+      ];
+      return data;
+    }
+    return holdingData;
   }
 
   accountGroupingData(list) {
