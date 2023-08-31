@@ -155,6 +155,7 @@
                         col.field === 'allocation');
                     else output
                   "
+                  (change)="handleHoldingChange(rowData, col.field)"
                 />
                 <ng-template #output>
                   {{ rowData[col.field] }}

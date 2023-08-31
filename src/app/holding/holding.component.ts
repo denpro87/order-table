@@ -587,4 +587,41 @@ export class HoldingComponent implements OnInit {
     }));
     delete this.clonedHolding[holding.holdingId];
   }
+
+  handleHoldingChange(holding: Holding, key) {
+    const clonedData = [...this.treeTableData];
+    this.treeTableData = clonedData.map((group) => ({
+      ...group,
+      children: group.children?.map((child) => {
+        if (child.data.holdingId === holding.holdingId) {
+          const totalValue = 100000;
+          let quantity = holding.quantity;
+          let allocation = holding.allocation;
+          let allocationPercent = holding.allocationPercent;
+          if (key === "quantity") {
+            if (quantity * holding.price < holding.minPurchase) {
+              quantity = Math.ceil(holding.minPurchase / holding.price);
+            }
+            allocation = quantity * holding.price;
+            allocationPercent = (allocation / totalValue) * 100;
+          } else if (key === "allocation") {
+            if (allocation < holding.minPurchase) {
+              allocation = holding.minPurchase;
+            }
+            quantity = Math.round(allocation / holding.price);
+            allocationPercent = (allocation / totalValue) * 100;
+          } else if (key === "allocationPercent") {
+            allocation = (allocationPercent * totalValue) / 100;
+            quantity = Math.round(allocation / holding.price);
+          }
+
+          return {
+            ...child,
+            data: { ...child.data, quantity, allocation, allocationPercent },
+          };
+        }
+        return child;
+      }),
+    }));
+  }
 }
