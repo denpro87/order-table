@@ -166,11 +166,7 @@
           <td *ngIf="isAccountView">
             <div
               class="flex align-items-center gap-2"
-              *ngIf="
-                !rowData.isGroup &&
-                !rowData.isTotal &&
-                rowData.isLocked === 'FALSE'
-              "
+              *ngIf="!rowData.isGroup && !rowData.isTotal && !rowData.isLocked"
             >
               <button
                 *ngIf="!rowData.isEditing"
@@ -214,11 +210,7 @@
               ></button>
             </div>
             <div
-              *ngIf="
-                !rowData.isGroup &&
-                !rowData.isTotal &&
-                rowData.isLocked === 'TRUE'
-              "
+              *ngIf="!rowData.isGroup && !rowData.isTotal && rowData.isLocked"
             >
               <span class="pi pi-lock text-primary"></span>
             </div>

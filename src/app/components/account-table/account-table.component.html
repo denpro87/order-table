@@ -93,7 +93,7 @@
         <td>
           <div
             class="flex align-items-center justify-content-center gap-2"
-            *ngIf="account.isLocked === 'FALSE'"
+            *ngIf="!account.isLocked"
           >
             <button
               *ngIf="!editing"
@@ -139,7 +139,7 @@
               (click)="deleteAccount(account.accountId)"
             ></button>
           </div>
-          <div *ngIf="account.isLocked === 'TRUE'">
+          <div *ngIf="account.isLocked">
             <span class="pi pi-lock text-primary"></span>
           </div>
         </td>
