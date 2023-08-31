@@ -125,9 +125,13 @@
               ></p-checkbox>
               <div
                 class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap ml-2"
-                [ngClass]="{ 'font-bold': rowData.isTotal }"
               >
-                {{ rowData.holdingName }}
+                <div class="font-bold">
+                  {{ rowData.holdingName }}
+                </div>
+                <div *ngIf="!rowData.isTotal && !rowData.isGroup">
+                  {{ rowData.holdingType }}
+                </div>
               </div>
             </div>
           </td>
