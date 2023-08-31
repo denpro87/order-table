@@ -91,7 +91,10 @@
           {{ account.minPurchase }}
         </td>
         <td>
-          <div class="flex align-items-center justify-content-center gap-2">
+          <div
+            class="flex align-items-center justify-content-center gap-2"
+            *ngIf="account.isLocked === 'FALSE'"
+          >
             <button
               *ngIf="!editing"
               pButton
@@ -135,6 +138,9 @@
               class="p-button-rounded p-button-text p-button-danger"
               (click)="deleteAccount(account.accountId)"
             ></button>
+          </div>
+          <div *ngIf="account.isLocked === 'TRUE'">
+            <span class="pi pi-lock text-primary"></span>
           </div>
         </td>
       </tr>

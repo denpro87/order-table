@@ -437,50 +437,29 @@ export class HoldingComponent implements OnInit {
   }
 
   accountGroupingData(list) {
-    const keysString = this.selectedGrouping.value[0];
-    const keys = keysString.split(" - ");
-    const groupingViaCommonProperty: { [key: string]: any[] } = list.reduce(
-      (acc, current) => {
-        const key =
-          keys.length > 1
-            ? `${current[keys[0]]} - ${current[keys[1]]}`
-            : current[keysString];
-        acc[key] = acc[key] ?? [];
-        acc[key].push(current);
-        return acc;
-      },
-      {}
-    );
-
-    const accountData = Object.entries(groupingViaCommonProperty).map(
-      ([group, value]) => {
-        const marketValue = value.reduce((accumulator, object) => {
-          return (
-            accumulator +
-            Number(
-              object.holdings.reduce((accumulator, holdingObject) => {
-                return accumulator + Number(holdingObject.marketValue || "0");
-              }, 0) || "0"
-            )
-          );
-        }, 0);
-        return {
+    const accountData = list.map((value) => {
+      const marketValue = value.holdings.reduce(
+        (accumulator, holdingObject) => {
+          return accumulator + Number(holdingObject.marketValue || "0");
+        },
+        0
+      );
+      return {
+        data: {
+          holdingName: `${value.accountName} (${value.accountId}) - ${value.accountType}`,
+          marketValue,
+          isGroup: true,
+        },
+        children: value.holdings.map((item) => ({
           data: {
-            holdingName: `${value[0].accountName} (${value[0].accountId}) - ${value[0].accountType}`,
-            marketValue,
-            isGroup: true,
+            ...item,
+            assetClassPercent: item.marketValue
+              ? (item.marketValue / marketValue) * 100
+              : "",
           },
-          children: value[0].holdings.map((item) => ({
-            data: {
-              ...item,
-              assetClassPercent: item.marketValue
-                ? (item.marketValue / marketValue) * 100
-                : "",
-            },
-          })),
-        };
-      }
-    );
+        })),
+      };
+    });
     const data = [
       {
         data: {

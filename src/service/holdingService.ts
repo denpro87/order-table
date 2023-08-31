@@ -309,7 +309,12 @@ export class HoldingService {
             accountType,
             programType,
             quantity: holdingObj.quantity,
-            allocation: holdingObj["allocation"],
+            allocation: holdingObj.allocation,
+            isLocked: holdingObj.isLocked,
+            sourceOfInvestment: holdingObj.sourceOfInvestment,
+            minPurchase: holdingObj.minPurchase,
+            allocationPercent: holdingObj.allocationPercent,
+            marketValue: holdingObj.quantity * holdingObj.price,
           };
           const holdingCode = holdingObj.holdingCode;
           //assuming holdingCode is unique identifier
