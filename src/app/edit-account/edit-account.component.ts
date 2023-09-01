@@ -294,10 +294,6 @@ export class EditAccountComponent implements OnInit {
 
   updateHolding(holding: Holding, field: keyof Holding): void {
     const value = Number(holding[field]);
-    // const index = this.holdings.findIndex(
-    //   (holding) => holding.holdingId === holdingId
-    // );
-    // let holding = this.holdings[index];
     // Switch based on which field is being updated
     switch (field) {
       case "quantity":
@@ -358,60 +354,4 @@ export class EditAccountComponent implements OnInit {
       this.holdings.reduce((acc, stock) => acc + stock.allocation, 0);
     this.updateTreeTableData();
   }
-
-  // updateHoldings() {
-  //   const totalValue = 100000;
-  //   let initialCash = totalValue;
-  //   this.holdings.forEach((holding) => {
-  //     holding.quantity = Math.round(holding.allocation / holding.price);
-  //     if (holding.quantity * holding.price < holding.minPurchase) {
-  //       holding.quantity = Math.ceil(holding.minPurchase / holding.price);
-  //       holding.allocation = holding.quantity * holding.price;
-  //     }
-  //     holding.allocationPercent = (holding.allocation / totalValue) * 100;
-  //     initialCash -= holding.allocation;
-  //   });
-  //   this.cash = initialCash;
-  //   this.updateTreeTableData();
-  // }
-
-  // updateByQuantity(holdingId, quantity) {
-  //   const index = this.holdings.findIndex(
-  //     (holding) => holding.holdingId === holdingId
-  //   );
-  //   let holding = this.holdings[index];
-  //   if (quantity * holding.price < holding.minPurchase) {
-  //     quantity = Math.ceil(holding.minPurchase / holding.price);
-  //   }
-  //   this.cash += holding.allocation;
-  //   holding.quantity = quantity;
-  //   holding.allocation = quantity * holding.price;
-  //   this.updateHoldings();
-  // }
-
-  // updateByPercent(holdingId, percent) {
-  //   const index = this.holdings.findIndex(
-  //     (holding) => holding.holdingId === holdingId
-  //   );
-  //   let totalValue =
-  //     this.cash +
-  //     this.holdings.reduce((acc, holding) => acc + holding.allocation, 0);
-  //   this.cash += this.holdings[index].allocation;
-  //   this.holdings[index].allocationPercent = percent;
-  //   this.holdings[index].allocation = (percent * totalValue) / 100;
-  //   this.updateHoldings();
-  // }
-
-  // updateByAllocation(holdingId, allocation) {
-  //   const index = this.holdings.findIndex(
-  //     (holding) => holding.holdingId === holdingId
-  //   );
-  //   let holding = this.holdings[index];
-  //   if (allocation < holding.minPurchase) {
-  //     allocation = holding.minPurchase;
-  //   }
-  //   this.cash += holding.allocation;
-  //   this.holdings[index].allocation = allocation;
-  //   this.updateHoldings();
-  // }
 }

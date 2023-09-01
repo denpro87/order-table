@@ -222,48 +222,6 @@
         </tr>
       </ng-template>
     </p-treeTable>
-
-    <!-- <p-table [value]="holdings">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Name</th>
-          <th>Units</th>
-          <th>Percent</th>
-          <th>Dollar</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-stock let-i="rowIndex">
-        <tr>
-          <td>{{ stock.holdingName }}</td>
-          <td>
-            <input
-              type="number"
-              [(ngModel)]="stock.quantity"
-              (change)="updateByQuantity(stock.holdingId, stock.quantity)"
-            />
-          </td>
-          <td>
-            <input
-              type="number"
-              step="0.01"
-              [(ngModel)]="stock.allocationPercent"
-              (change)="
-                updateByPercent(stock.holdingId, stock.allocationPercent)
-              "
-            />
-          </td>
-          <td>
-            <input
-              type="number"
-              [(ngModel)]="stock.allocation"
-              (change)="updateByAllocation(stock.holdingId, stock.allocation)"
-            />
-          </td>
-          <td><button>Delete</button></td>
-        </tr>
-      </ng-template>
-    </p-table> -->
   </div>
   <p-confirmPopup></p-confirmPopup>
 </div>

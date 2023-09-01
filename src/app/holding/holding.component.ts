@@ -395,7 +395,9 @@ export class HoldingComponent implements OnInit {
               return accumulator + Number(object.portfolioPercent);
             }, 0),
             assetClassPercent:
-              deep === 0 ? 100 : (marketValue / parentMarketValue) * 100,
+              deep === 0
+                ? 100
+                : Math.round((marketValue / parentMarketValue) * 10000) / 100,
             isGroup: true,
           },
           children:
@@ -407,7 +409,9 @@ export class HoldingComponent implements OnInit {
                   return {
                     data: {
                       ...itemData,
-                      assetClassPercent: (item.marketValue / marketValue) * 100,
+                      assetClassPercent:
+                        Math.round((item.marketValue / marketValue) * 10000) /
+                        100,
                     },
                     children: [
                       {
@@ -454,14 +458,14 @@ export class HoldingComponent implements OnInit {
       return {
         data: {
           holdingName: `${value.accountName} (${value.accountId}) - ${value.accountType}`,
-          marketValue,
+          marketValue: Math.round(marketValue * 100) / 100,
           isGroup: true,
         },
         children: value.holdings.map((item) => ({
           data: {
             ...item,
             assetClassPercent: item.marketValue
-              ? (item.marketValue / marketValue) * 100
+              ? Math.round((item.marketValue / marketValue) * 10000) / 100
               : "",
           },
         })),
@@ -599,29 +603,43 @@ export class HoldingComponent implements OnInit {
     const clonedData = [...this.treeTableData];
     let totalMarketValue = 0;
     this.treeTableData = clonedData.map((group) => {
+      let parentMarketValue = group.data.marketValue;
       const children = group.children?.map((child) => {
+        let originalMarketValue = child.data.price * child.data.quantity;
         if (child.data.holdingId === holding.holdingId) {
-          const totalValue = 100000;
-          let quantity = holding.quantity;
+          const initialCash = 100000;
+          let quantity = Math.round(holding.quantity);
           let allocation = holding.allocation;
           let allocationPercent = holding.allocationPercent;
           if (key === "quantity") {
-            if (quantity * holding.price < holding.minPurchase) {
-              quantity = Math.ceil(holding.minPurchase / holding.price);
-            }
             allocation = quantity * holding.price;
-            allocationPercent = (allocation / totalValue) * 100;
-          } else if (key === "allocation") {
-            if (allocation < holding.minPurchase) {
-              allocation = holding.minPurchase;
-            }
-            quantity = Math.round(allocation / holding.price);
-            allocationPercent = (allocation / totalValue) * 100;
+            allocationPercent = (allocation / initialCash) * 100;
+            originalMarketValue = child.data.markerValue;
           } else if (key === "allocationPercent") {
-            allocation = (allocationPercent * totalValue) / 100;
+            allocation = (allocationPercent * initialCash) / 100;
             quantity = Math.round(allocation / holding.price);
+            allocation = quantity * holding.price;
+            allocationPercent = (allocation / initialCash) * 100;
+          } else if (key === "allocation") {
+            quantity = Math.round(allocation / holding.price);
+            allocation = quantity * holding.price;
+            allocationPercent = (allocation / initialCash) * 100;
           }
+
+          if (allocation < holding.minPurchase) {
+            // Adjust the dollar value to the minimum purchase
+            allocation = holding.minPurchase;
+            // Recalculate and round units based on the adjusted dollar value
+            quantity = Math.round(allocation / holding.price);
+            // Recalculate the stock's percentage of the portfolio based on the adjusted dollar value
+            allocationPercent = (allocation / initialCash) * 100;
+          }
+
           totalMarketValue += allocation;
+          parentMarketValue =
+            Math.round(
+              (parentMarketValue - originalMarketValue + allocation) * 100
+            ) / 100;
 
           return {
             ...child,
@@ -631,25 +649,29 @@ export class HoldingComponent implements OnInit {
               allocation,
               allocationPercent,
               marketValue: allocation,
+              assetClassPercent:
+                Math.round((allocation / parentMarketValue) * 10000) / 100,
             },
           };
         }
 
         totalMarketValue += child.data.marketValue;
-        return child;
+        return {
+          ...child,
+          data: {
+            ...child.data,
+            assetClassPercent:
+              Math.round((child.data.marketValue / parentMarketValue) * 10000) /
+              100,
+          },
+        };
       });
       return {
         ...group,
         children,
         data: {
           ...group.data,
-          marketValue: children
-            ? Math.round(
-                children?.reduce((accumulator, object) => {
-                  return accumulator + object.data.marketValue;
-                }, 0) * 100
-              ) / 100
-            : group.data.marketValue,
+          marketValue: parentMarketValue,
         },
       };
     });
