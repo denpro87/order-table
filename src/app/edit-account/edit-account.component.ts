@@ -58,6 +58,7 @@ export class EditAccountComponent implements OnInit {
   selectedHoldings: number[] = [];
 
   cash = 100000;
+  initialCash = 100000;
   holdings: Holding[] = [];
   currentAccount!: AccountWithHolding;
   constructor(
@@ -73,7 +74,7 @@ export class EditAccountComponent implements OnInit {
       this.athArrData = arrayData.athArrData;
       this.currentAccount = this.athArrData[0];
       this.holdings = this.currentAccount.holdings;
-      this.updateHoldings();
+      this.updateCash();
     });
   }
 
@@ -134,7 +135,7 @@ export class EditAccountComponent implements OnInit {
 
   onAccountChange() {
     this.holdings = this.currentAccount.holdings;
-    this.updateHoldings();
+    this.updateCash();
   }
 
   onColumnsChange(columns: string[]) {
@@ -174,12 +175,18 @@ export class EditAccountComponent implements OnInit {
         expanded: true,
         data: {
           holdingName: `${group} (${value.length})`,
-          allocation: value.reduce((accumulator, object) => {
-            return accumulator + Number(object.allocation);
-          }, 0),
-          allocationPercent: value.reduce((accumulator, object) => {
-            return accumulator + Number(object.allocationPercent);
-          }, 0),
+          allocation:
+            Math.round(
+              value.reduce((accumulator, object) => {
+                return accumulator + Number(object.allocation);
+              }, 0) * 100
+            ) / 100,
+          allocationPercent:
+            Math.round(
+              value.reduce((accumulator, object) => {
+                return accumulator + Number(object.allocationPercent);
+              }, 0) * 100
+            ) / 100,
           isGroup: true,
         },
         children: value.map((item) => {
@@ -225,7 +232,7 @@ export class EditAccountComponent implements OnInit {
       icon: "pi pi-exclamation-triangle",
       accept: () => {
         this.deleteHolding(holdingId);
-        this.updateHoldings();
+        this.updateCash();
       },
     });
   }
@@ -247,7 +254,7 @@ export class EditAccountComponent implements OnInit {
         for (const holdingId of this.selectedHoldings) {
           this.deleteHolding(holdingId);
         }
-        this.updateHoldings();
+        this.updateCash();
       },
     });
   }
@@ -285,59 +292,126 @@ export class EditAccountComponent implements OnInit {
     }
   }
 
-  updateHoldings() {
-    const totalValue = 100000;
-    let initialCash = totalValue;
-    this.holdings.forEach((holding) => {
-      holding.quantity = Math.round(holding.allocation / holding.price);
-      if (holding.quantity * holding.price < holding.minPurchase) {
-        holding.quantity = Math.ceil(holding.minPurchase / holding.price);
+  updateHolding(holding: Holding, field: keyof Holding): void {
+    const value = Number(holding[field]);
+    // const index = this.holdings.findIndex(
+    //   (holding) => holding.holdingId === holdingId
+    // );
+    // let holding = this.holdings[index];
+    // Switch based on which field is being updated
+    switch (field) {
+      case "quantity":
+        // If quantity are updated, round to a whole number
+        holding.quantity = Math.round(value);
+        // Calculate the total dollar value based on the units and stock price
         holding.allocation = holding.quantity * holding.price;
-      }
-      holding.allocationPercent = (holding.allocation / totalValue) * 100;
-      initialCash -= holding.allocation;
-    });
-    this.cash = initialCash;
+        // Calculate the percentage of the portfolio this stock represents
+        holding.allocationPercent =
+          (holding.allocation / this.initialCash) * 100;
+        break;
+      case "allocationPercent":
+        // If percentage is updated, set the stock's percent value
+        holding.allocationPercent = value;
+        // Calculate the total dollar value based on the portfolio percentage
+        holding.allocation =
+          (this.initialCash * holding.allocationPercent) / 100;
+        // Calculate and round the units based on the dollar value and stock price
+        holding.quantity = Math.round(holding.allocation / holding.price);
+        // Recalculate dollar value after rounding units to ensure no fractional shares
+        holding.allocation = holding.quantity * holding.price;
+        // Recalculate the stock's percentage of the portfolio after rounding units
+        holding.allocationPercent =
+          (holding.allocation / this.initialCash) * 100;
+        break;
+      case "allocation":
+        // If dollar value is updated, set the stock's dollar value
+        holding.allocation = value;
+        // Calculate and round the units based on the dollar value and stock price
+        holding.quantity = Math.round(holding.allocation / holding.price);
+        // Recalculate dollar value after rounding units to ensure no fractional shares
+        holding.allocation = holding.quantity * holding.price;
+        // Recalculate the stock's percentage of the portfolio after rounding units
+        holding.allocationPercent =
+          (holding.allocation / this.initialCash) * 100;
+        break;
+      default:
+        break;
+    }
+
+    // After calculations, check if the dollar value meets the minimum purchase requirement
+    if (holding.allocation < holding.minPurchase) {
+      // Adjust the dollar value to the minimum purchase
+      holding.allocation = holding.minPurchase;
+      // Recalculate and round units based on the adjusted dollar value
+      holding.quantity = Math.round(holding.allocation / holding.price);
+      // Recalculate the stock's percentage of the portfolio based on the adjusted dollar value
+      holding.allocationPercent = (holding.allocation / this.initialCash) * 100;
+    }
+
+    // After all updates, recalculate the total cash left in the portfolio
+    this.updateCash();
+  }
+
+  updateCash() {
+    this.cash =
+      this.initialCash -
+      this.holdings.reduce((acc, stock) => acc + stock.allocation, 0);
     this.updateTreeTableData();
   }
 
-  updateByQuantity(holdingId, quantity) {
-    const index = this.holdings.findIndex(
-      (holding) => holding.holdingId === holdingId
-    );
-    let holding = this.holdings[index];
-    if (quantity * holding.price < holding.minPurchase) {
-      quantity = Math.ceil(holding.minPurchase / holding.price);
-    }
-    this.cash += holding.allocation;
-    holding.quantity = quantity;
-    holding.allocation = quantity * holding.price;
-    this.updateHoldings();
-  }
+  // updateHoldings() {
+  //   const totalValue = 100000;
+  //   let initialCash = totalValue;
+  //   this.holdings.forEach((holding) => {
+  //     holding.quantity = Math.round(holding.allocation / holding.price);
+  //     if (holding.quantity * holding.price < holding.minPurchase) {
+  //       holding.quantity = Math.ceil(holding.minPurchase / holding.price);
+  //       holding.allocation = holding.quantity * holding.price;
+  //     }
+  //     holding.allocationPercent = (holding.allocation / totalValue) * 100;
+  //     initialCash -= holding.allocation;
+  //   });
+  //   this.cash = initialCash;
+  //   this.updateTreeTableData();
+  // }
 
-  updateByPercent(holdingId, percent) {
-    const index = this.holdings.findIndex(
-      (holding) => holding.holdingId === holdingId
-    );
-    let totalValue =
-      this.cash +
-      this.holdings.reduce((acc, holding) => acc + holding.allocation, 0);
-    this.cash += this.holdings[index].allocation;
-    this.holdings[index].allocationPercent = percent;
-    this.holdings[index].allocation = (percent * totalValue) / 100;
-    this.updateHoldings();
-  }
+  // updateByQuantity(holdingId, quantity) {
+  //   const index = this.holdings.findIndex(
+  //     (holding) => holding.holdingId === holdingId
+  //   );
+  //   let holding = this.holdings[index];
+  //   if (quantity * holding.price < holding.minPurchase) {
+  //     quantity = Math.ceil(holding.minPurchase / holding.price);
+  //   }
+  //   this.cash += holding.allocation;
+  //   holding.quantity = quantity;
+  //   holding.allocation = quantity * holding.price;
+  //   this.updateHoldings();
+  // }
 
-  updateByAllocation(holdingId, allocation) {
-    const index = this.holdings.findIndex(
-      (holding) => holding.holdingId === holdingId
-    );
-    let holding = this.holdings[index];
-    if (allocation < holding.minPurchase) {
-      allocation = holding.minPurchase;
-    }
-    this.cash += holding.allocation;
-    this.holdings[index].allocation = allocation;
-    this.updateHoldings();
-  }
+  // updateByPercent(holdingId, percent) {
+  //   const index = this.holdings.findIndex(
+  //     (holding) => holding.holdingId === holdingId
+  //   );
+  //   let totalValue =
+  //     this.cash +
+  //     this.holdings.reduce((acc, holding) => acc + holding.allocation, 0);
+  //   this.cash += this.holdings[index].allocation;
+  //   this.holdings[index].allocationPercent = percent;
+  //   this.holdings[index].allocation = (percent * totalValue) / 100;
+  //   this.updateHoldings();
+  // }
+
+  // updateByAllocation(holdingId, allocation) {
+  //   const index = this.holdings.findIndex(
+  //     (holding) => holding.holdingId === holdingId
+  //   );
+  //   let holding = this.holdings[index];
+  //   if (allocation < holding.minPurchase) {
+  //     allocation = holding.minPurchase;
+  //   }
+  //   this.cash += holding.allocation;
+  //   this.holdings[index].allocation = allocation;
+  //   this.updateHoldings();
+  // }
 }

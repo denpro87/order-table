@@ -145,7 +145,7 @@
                 type="number"
                 class="w-full"
                 [(ngModel)]="rowData.quantity"
-                (change)="updateByQuantity(rowData.holdingId, rowData.quantity)"
+                (change)="updateHolding(rowData, 'quantity')"
               />
               <ng-template #quantityOutput>
                 {{ rowData.quantity }}
@@ -164,9 +164,7 @@
                 type="number"
                 class="w-full"
                 [(ngModel)]="rowData.allocationPercent"
-                (change)="
-                  updateByPercent(rowData.holdingId, rowData.allocationPercent)
-                "
+                (change)="updateHolding(rowData, 'allocationPercent')"
               />
             </span>
             <ng-template #percentOutput>
@@ -197,9 +195,7 @@
                 type="number"
                 class="w-full"
                 [(ngModel)]="rowData.allocation"
-                (change)="
-                  updateByAllocation(rowData.holdingId, rowData.allocation)
-                "
+                (change)="updateHolding(rowData, 'allocation')"
               />
             </span>
             <ng-template #allocationOutput>
