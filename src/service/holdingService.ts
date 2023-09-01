@@ -412,7 +412,8 @@ export class HoldingService {
         };
       })
       .map((_) => {
-        const portfolioPercent = (_.marketValue / totalValue) * 100;
+        const portfolioPercent =
+          Math.round((_.marketValue / totalValue) * 10000) / 100;
         return {
           ..._,
           portfolioPercent,

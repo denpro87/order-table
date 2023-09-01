@@ -675,11 +675,9 @@ export class HoldingComponent implements OnInit {
   }
 
   handleAccountMarketValueChange({ diff, accounts }, holdingId) {
-    const treeTableData = [...this.treeTableData];
-    const node = this.findHoldingById(treeTableData, holdingId);
+    const node = this.findHoldingById(this.treeTableData, holdingId);
     node.children[0].data.accounts = accounts;
-    this.updateParentHolding(node, diff);
-    this.treeTableData[0].data.marketValue += diff;
+    this.updateHolding([...this.treeTableData], diff);
   }
 
   findHoldingById(list, holdingId) {
@@ -698,16 +696,61 @@ export class HoldingComponent implements OnInit {
     return false;
   }
 
-  updateParentHolding(node, diff) {
-    const treeTableData = [...this.treeTableData];
-    node.data.marketValue = node.data.marketValue + diff;
-    const parent = node.parent;
-    if (parent) {
-      parent.data.marketValue += diff;
+  updateHolding(list, diff) {
+    for (let index = 0; index < list.length; index++) {
+      const element = list[index];
+      const portfolioPercent = element.isTotal
+        ? ""
+        : element.data.portfolioPercent;
+      const totalValue = element.data.isTotal
+        ? Math.round((element.data.marketValue + diff) * 100) / 100
+        : (element.data.marketValue / portfolioPercent) * 100 + diff;
+
+      if (element.children?.[0].data?.accounts) {
+        const marketValue = element.children[0].data.accounts.reduce(
+          (accumulator, object) => {
+            return accumulator + Number(object.marketValue);
+          },
+          0
+        );
+        list[index] = {
+          ...element,
+          data: {
+            ...element.data,
+            marketValue,
+            portfolioPercent:
+              Math.round((marketValue / totalValue) * 10000) / 100,
+          },
+        };
+      } else if (element.children) {
+        const children = this.updateHolding(element.children, diff);
+        const marketValue = element.children.reduce((accumulator, object) => {
+          return accumulator + Number(object.data.marketValue);
+        }, 0);
+        list[index] = {
+          ...element,
+          children,
+          data: {
+            ...element.data,
+            marketValue,
+            portfolioPercent:
+              Math.round((marketValue / totalValue) * 10000) / 100,
+          },
+        };
+      } else {
+        list[index] = {
+          ...element,
+          data: {
+            ...element.data,
+            marketValue:
+              Math.round((element.data.marketValue + diff) * 100) / 100,
+          },
+        };
+      }
     }
-    this.treeTableData = treeTableData;
-    if (parent?.parent) {
-      this.updateParentHolding(parent.parent, diff);
+    if (!list[0].parent) {
+      this.treeTableData = list;
     }
+    return list;
   }
 }
