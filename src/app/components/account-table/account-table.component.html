@@ -2,7 +2,7 @@
   <p-table
     [value]="accounts"
     [scrollable]="true"
-    dataKey="id"
+    dataKey="accountId"
     editMode="row"
     class="account-table"
   >
@@ -139,7 +139,7 @@
               styleClass="p-button-sm"
               icon="pi pi-trash"
               class="p-button-rounded p-button-text p-button-danger"
-              (click)="deleteAccount(account.accountId)"
+              (click)="deleteAccount(account)"
             ></button>
           </div>
           <div *ngIf="account.isLocked">

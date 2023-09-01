@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 
 import { Holding, Account, Column } from "../../../types";
 
@@ -9,6 +9,7 @@ import { Holding, Account, Column } from "../../../types";
 })
 export class AccountTableComponent implements OnInit {
   @Input() accounts!: Account[];
+  @Output() accountMarketValueChangeEvent = new EventEmitter();
   clonedAccount: { [s: string]: Account } = {};
 
   accountCols!: Column[];
@@ -30,8 +31,14 @@ export class AccountTableComponent implements OnInit {
     ];
   }
 
-  deleteAccount(id: string) {
-    this.accounts = this.accounts.filter((account) => account.accountId !== id);
+  deleteAccount(account: Account) {
+    this.accounts = this.accounts.filter(
+      (item) => account.accountId !== item.accountId
+    );
+    this.accountMarketValueChangeEvent.emit({
+      diff: -account.allocation,
+      accounts: this.accounts,
+    });
   }
 
   onAccountRowEditInit(account: Account) {
@@ -39,6 +46,13 @@ export class AccountTableComponent implements OnInit {
   }
 
   onAccountRowEditSave(account: Account) {
+    const diff =
+      account.allocation -
+      this.clonedAccount[account.accountId as string].allocation;
+    this.accountMarketValueChangeEvent.emit({
+      diff,
+      accounts: this.accounts,
+    });
     delete this.clonedAccount[account.accountId as string];
   }
 
@@ -48,7 +62,6 @@ export class AccountTableComponent implements OnInit {
   }
 
   handleHoldingChange(account, index, key) {
-    console.log(account);
     const totalValue = 100000;
     let quantity = account.quantity;
     let allocation = account.allocation;

@@ -350,6 +350,7 @@ export class HoldingService {
             ...[
               "holdingName",
               "holdingCode",
+              "holdingId",
               "holdingType",
               "assetClass",
               "subAssetClass",

@@ -409,7 +409,14 @@ export class HoldingComponent implements OnInit {
                       ...itemData,
                       assetClassPercent: (item.marketValue / marketValue) * 100,
                     },
-                    children: [{ data: { accounts: item["accounts"] } }],
+                    children: [
+                      {
+                        data: {
+                          holdingId: item.holdingId,
+                          accounts: item["accounts"],
+                        },
+                      },
+                    ],
                   };
                 }),
         };
@@ -648,5 +655,42 @@ export class HoldingComponent implements OnInit {
     });
     this.treeTableData[0].data.marketValue =
       Math.round(totalMarketValue * 100) / 100;
+  }
+
+  handleAccountMarketValueChange({ diff, accounts }, holdingId) {
+    const treeTableData = [...this.treeTableData];
+    const node = this.findHoldingById(treeTableData, holdingId);
+    node.children[0].data.accounts = accounts;
+    this.updateParentHolding(node, diff);
+    this.treeTableData[0].data.marketValue += diff;
+  }
+
+  findHoldingById(list, holdingId) {
+    for (const node of list) {
+      if (node.data.holdingId === holdingId) {
+        return node;
+      }
+
+      if (node.children) {
+        const desiredNode = this.findHoldingById(node.children, holdingId);
+        if (desiredNode) {
+          return desiredNode;
+        }
+      }
+    }
+    return false;
+  }
+
+  updateParentHolding(node, diff) {
+    const treeTableData = [...this.treeTableData];
+    node.data.marketValue = node.data.marketValue + diff;
+    const parent = node.parent;
+    if (parent) {
+      parent.data.marketValue += diff;
+    }
+    this.treeTableData = treeTableData;
+    if (parent?.parent) {
+      this.updateParentHolding(parent.parent, diff);
+    }
   }
 }

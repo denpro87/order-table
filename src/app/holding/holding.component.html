@@ -121,7 +121,12 @@
       >
         <tr *ngIf="rowData.accounts">
           <td [attr.colspan]="selectedColumns.length">
-            <app-account-table [accounts]="rowData.accounts" />
+            <app-account-table
+              [accounts]="rowData.accounts"
+              (accountMarketValueChangeEvent)="
+                handleAccountMarketValueChange($event, rowData.holdingId)
+              "
+            />
           </td>
         </tr>
         <tr
