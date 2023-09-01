@@ -299,11 +299,6 @@ export class EditAccountComponent implements OnInit {
       case "quantity":
         // If quantity are updated, round to a whole number
         holding.quantity = Math.round(value);
-        // Calculate the total dollar value based on the units and stock price
-        holding.allocation = holding.quantity * holding.price;
-        // Calculate the percentage of the portfolio this stock represents
-        holding.allocationPercent =
-          (holding.allocation / this.initialCash) * 100;
         break;
       case "allocationPercent":
         // If percentage is updated, set the stock's percent value
@@ -313,27 +308,21 @@ export class EditAccountComponent implements OnInit {
           (this.initialCash * holding.allocationPercent) / 100;
         // Calculate and round the units based on the dollar value and stock price
         holding.quantity = Math.round(holding.allocation / holding.price);
-        // Recalculate dollar value after rounding units to ensure no fractional shares
-        holding.allocation = holding.quantity * holding.price;
-        // Recalculate the stock's percentage of the portfolio after rounding units
-        holding.allocationPercent =
-          (holding.allocation / this.initialCash) * 100;
         break;
       case "allocation":
         // If dollar value is updated, set the stock's dollar value
         holding.allocation = value;
         // Calculate and round the units based on the dollar value and stock price
         holding.quantity = Math.round(holding.allocation / holding.price);
-        // Recalculate dollar value after rounding units to ensure no fractional shares
-        holding.allocation = holding.quantity * holding.price;
-        // Recalculate the stock's percentage of the portfolio after rounding units
-        holding.allocationPercent =
-          (holding.allocation / this.initialCash) * 100;
+
         break;
       default:
         break;
     }
-
+    // Recalculate dollar value after rounding units to ensure no fractional shares
+    holding.allocation = holding.quantity * holding.price;
+    // Recalculate the stock's percentage of the portfolio after rounding units
+    holding.allocationPercent = (holding.allocation / this.initialCash) * 100;
     // After calculations, check if the dollar value meets the minimum purchase requirement
     if (holding.allocation < holding.minPurchase) {
       // Adjust the dollar value to the minimum purchase

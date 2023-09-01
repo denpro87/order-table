@@ -612,20 +612,15 @@ export class HoldingComponent implements OnInit {
           let allocation = holding.allocation;
           let allocationPercent = holding.allocationPercent;
           if (key === "quantity") {
-            allocation = quantity * holding.price;
-            allocationPercent = (allocation / initialCash) * 100;
             originalMarketValue = child.data.markerValue;
           } else if (key === "allocationPercent") {
             allocation = (allocationPercent * initialCash) / 100;
             quantity = Math.round(allocation / holding.price);
-            allocation = quantity * holding.price;
-            allocationPercent = (allocation / initialCash) * 100;
           } else if (key === "allocation") {
             quantity = Math.round(allocation / holding.price);
-            allocation = quantity * holding.price;
-            allocationPercent = (allocation / initialCash) * 100;
           }
-
+          allocation = quantity * holding.price;
+          allocationPercent = (allocation / initialCash) * 100;
           if (allocation < holding.minPurchase) {
             // Adjust the dollar value to the minimum purchase
             allocation = holding.minPurchase;

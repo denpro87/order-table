@@ -62,26 +62,28 @@ export class AccountTableComponent implements OnInit {
   }
 
   handleHoldingChange(account, index, key) {
-    const totalValue = 100000;
+    const initialCash = 100000;
     let quantity = account.quantity;
     let allocation = account.allocation;
     let allocationPercent = account.allocationPercent;
-    if (key === "quantity") {
-      if (quantity * account.price < account.minPurchase) {
-        quantity = Math.ceil(account.minPurchase / account.price);
-      }
-      allocation = quantity * account.price;
-      allocationPercent = (allocation / totalValue) * 100;
-    } else if (key === "allocation") {
-      if (allocation < account.minPurchase) {
-        allocation = account.minPurchase;
-      }
+    if (key === "allocationPercent") {
+      allocation = (allocationPercent * initialCash) / 100;
       quantity = Math.round(allocation / account.price);
-      allocationPercent = (allocation / totalValue) * 100;
-    } else if (key === "allocationPercent") {
-      allocation = (allocationPercent * totalValue) / 100;
+    } else if (key === "allocation") {
       quantity = Math.round(allocation / account.price);
     }
+    allocation = quantity * account.price;
+    allocationPercent = Math.round((allocation / initialCash) * 10000) / 100;
+
+    if (allocation < account.minPurchase) {
+      // Adjust the dollar value to the minimum purchase
+      allocation = account.minPurchase;
+      // Recalculate and round units based on the adjusted dollar value
+      quantity = Math.round(allocation / account.price);
+      // Recalculate the stock's percentage of the portfolio based on the adjusted dollar value
+      allocationPercent = (allocation / initialCash) * 100;
+    }
+
     this.accounts[index] = {
       ...this.accounts[index],
       quantity,
