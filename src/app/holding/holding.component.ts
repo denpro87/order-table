@@ -606,36 +606,42 @@ export class HoldingComponent implements OnInit {
       let parentMarketValue = group.data.marketValue;
       const children = group.children?.map((child) => {
         let originalMarketValue = child.data.price * child.data.quantity;
-        if (child.data.holdingId === holding.holdingId) {
-          const initialCash = 100000;
-          let quantity = Math.round(holding.quantity);
-          let allocation = holding.allocation;
-          let allocationPercent = holding.allocationPercent;
-          if (key === "quantity") {
-            originalMarketValue = child.data.marketValue;
-          } else if (key === "allocationPercent") {
-            allocation = (allocationPercent * initialCash) / 100;
-            quantity = Math.round(allocation / holding.price);
-          } else if (key === "allocation") {
-            quantity = Math.round(allocation / holding.price);
-          }
-          allocation = quantity * holding.price;
+        const initialCash = 100000;
+        let quantity = Math.round(holding.quantity);
+        let allocation = holding.allocation;
+        let allocationPercent = holding.allocationPercent;
+        if (key === "quantity") {
+          originalMarketValue = child.data.marketValue;
+        } else if (key === "allocationPercent") {
+          allocation = (allocationPercent * initialCash) / 100;
+          quantity = Math.round(allocation / holding.price);
+        } else if (key === "allocation") {
+          quantity = Math.round(allocation / holding.price);
+        }
+        allocation = quantity * holding.price;
+        allocationPercent = (allocation / initialCash) * 100;
+        if (allocation < holding.minPurchase) {
+          // Adjust the dollar value to the minimum purchase
+          allocation = holding.minPurchase;
+          // Recalculate and round units based on the adjusted dollar value
+          quantity = Math.round(allocation / holding.price);
+          // Recalculate the stock's percentage of the portfolio based on the adjusted dollar value
           allocationPercent = (allocation / initialCash) * 100;
-          if (allocation < holding.minPurchase) {
-            // Adjust the dollar value to the minimum purchase
-            allocation = holding.minPurchase;
-            // Recalculate and round units based on the adjusted dollar value
-            quantity = Math.round(allocation / holding.price);
-            // Recalculate the stock's percentage of the portfolio based on the adjusted dollar value
-            allocationPercent = (allocation / initialCash) * 100;
-          }
+        }
 
-          totalMarketValue += allocation;
-          parentMarketValue =
-            Math.round(
-              (parentMarketValue - originalMarketValue + allocation) * 100
-            ) / 100;
-
+        totalMarketValue += allocation;
+        parentMarketValue =
+          Math.round(
+            (parentMarketValue - originalMarketValue + allocation) * 100
+          ) / 100;
+        const newTotalMarketValue =
+          Math.round(
+            (clonedData[0].data.marketValue -
+              holding.marketValue +
+              allocation) *
+              100
+          ) / 100;
+        if (child.data.holdingId === holding.holdingId) {
           return {
             ...child,
             data: {
@@ -646,6 +652,8 @@ export class HoldingComponent implements OnInit {
               marketValue: allocation,
               assetClassPercent:
                 Math.round((allocation / parentMarketValue) * 10000) / 100,
+              portfolioPercent:
+                Math.round((allocation / newTotalMarketValue) * 10000) / 100,
             },
           };
         }
@@ -658,6 +666,8 @@ export class HoldingComponent implements OnInit {
             assetClassPercent:
               Math.round((child.data.marketValue / parentMarketValue) * 10000) /
               100,
+            portfolioPercent:
+              Math.round((allocation / newTotalMarketValue) * 10000) / 100,
           },
         };
       });
