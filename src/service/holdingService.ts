@@ -32,7 +32,7 @@ export class HoldingService {
                 quantity: 25,
                 price: 23.89,
                 marketValue: 597.25,
-                portfolioPercent: null,
+                portfolioPercent: 0.36,
                 portfolioManger: "Julia Wilson",
                 allocation: 597.25,
                 allocationPercent: 5.7,

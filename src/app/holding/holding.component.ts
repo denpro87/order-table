@@ -612,7 +612,7 @@ export class HoldingComponent implements OnInit {
           let allocation = holding.allocation;
           let allocationPercent = holding.allocationPercent;
           if (key === "quantity") {
-            originalMarketValue = child.data.markerValue;
+            originalMarketValue = child.data.marketValue;
           } else if (key === "allocationPercent") {
             allocation = (allocationPercent * initialCash) / 100;
             quantity = Math.round(allocation / holding.price);
