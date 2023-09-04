@@ -1,1 +1,45 @@
-<p>equity-style-table works!</p>
+<p-table
+  [value]="tableData"
+  rowGroupMode="subheader"
+  groupRowsBy="categoryGroup"
+  class="equity-style-table"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th
+        *ngFor="let column of cols; let i = index"
+        [ngStyle]="{
+          width: i === 0 ? '200px' : 'fit-content'
+        }"
+      >
+        {{ column.header }}
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="groupheader" let-rowData>
+    <tr pRowGroupHeader>
+      <td *ngFor="let column of cols" [ngSwitch]="column.field">
+        <ng-container *ngSwitchCase="'category'">{{
+          rowData.categoryGroup
+        }}</ng-container>
+        <ng-container *ngSwitchDefault>
+          {{ groupingViaCategoryGroup[rowData.categoryGroup][column.field] }}%
+        </ng-container>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
+    <tr>
+      <td *ngFor="let column of cols" [ngSwitch]="column.field">
+        <ng-container *ngSwitchCase="'category'">
+          <span style="margin-left: 24px">
+            {{ rowData[column.field] }}
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          {{ rowData[column.field] }}%
+        </ng-container>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

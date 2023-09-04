@@ -5,7 +5,7 @@ export * from "./characteristics";
 export interface Column {
   field: string;
   header: string;
-  filterType: string;
+  filterType?: string;
 }
 
 export interface DropDownOption {
