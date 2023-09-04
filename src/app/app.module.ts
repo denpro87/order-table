@@ -104,6 +104,7 @@ import { AccountTableComponent } from "./components/account-table/account-table.
 import { ColumnFilterComponent } from "./components/column-filter/column-filter.component";
 import { RowFilterComponent } from "./components/row-filter/row-filter.component";
 import { EditAccountComponent } from './edit-account/edit-account.component';
+import { EquityCharacteristicsComponent } from './equity-characteristics/equity-characteristics.component';
 
 @NgModule({
   imports: [
@@ -210,6 +211,7 @@ import { EditAccountComponent } from './edit-account/edit-account.component';
     ColumnFilterComponent,
     RowFilterComponent,
     EditAccountComponent,
+    EquityCharacteristicsComponent,
   ],
   bootstrap: [AppComponent],
   providers: [CustomerService, HoldingService],
