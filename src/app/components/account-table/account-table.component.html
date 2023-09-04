@@ -1,0 +1,157 @@
+<div>
+  <p-table
+    [value]="accounts"
+    [scrollable]="true"
+    dataKey="accountId"
+    editMode="row"
+    class="account-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          *ngFor="let col of accountCols; let i = index"
+          [pSortableColumn]="col.field"
+          [ngStyle]="{
+            width: i === 0 ? '200px' : 'fit-content'
+          }"
+        >
+          {{ col.header }}
+          <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+        </th>
+        <th style="width: 70px"></th>
+      </tr>
+    </ng-template>
+    <ng-template
+      pTemplate="body"
+      let-account
+      let-editing="editing"
+      let-ri="rowIndex"
+    >
+      <tr [pEditableRow]="account">
+        <td>{{ account.accountName }}</td>
+        <td>{{ account.accountId }}</td>
+        <td>
+          {{ account.accountType }}
+        </td>
+        <td>
+          {{ account.programType }}
+        </td>
+        <td>
+          {{ account.sourceOfInvestment }}
+        </td>
+        <td>
+          {{ account.marketValue }}
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.quantity"
+                (change)="handleHoldingChange(account, ri, 'quantity')"
+              />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.quantity }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.allocationPercent"
+                (change)="handleHoldingChange(account, ri, 'allocationPercent')"
+              />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.allocationPercent }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                class="w-full"
+                pInputText
+                type="number"
+                [(ngModel)]="account.allocation"
+                (change)="handleHoldingChange(account, ri, 'allocation')"
+              />
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{ account.allocation }}
+            </ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          {{ account.minPurchase }}
+        </td>
+        <td>
+          <div
+            class="flex align-items-center justify-content-center gap-2"
+            *ngIf="!account.isLocked"
+          >
+            <button
+              *ngIf="!editing"
+              pButton
+              pRipple
+              type="button"
+              pInitEditableRow
+              icon="pi pi-pencil"
+              styleClass="p-button-sm"
+              (click)="onAccountRowEditInit(account)"
+              class="p-button-rounded p-button-text"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pSaveEditableRow
+              icon="pi pi-check"
+              styleClass="p-button-sm"
+              (click)="onAccountRowEditSave(account)"
+              class="p-button-rounded p-button-text p-button-success mr-2"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pCancelEditableRow
+              icon="pi pi-times"
+              styleClass="p-button-sm"
+              (click)="onAccountRowEditCancel(account, ri)"
+              class="p-button-rounded p-button-text p-button-danger"
+            ></button>
+            <button
+              *ngIf="!editing"
+              type="button"
+              pButton
+              pRipple
+              styleClass="p-button-sm"
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="deleteAccount(account)"
+            ></button>
+          </div>
+          <div *ngIf="account.isLocked">
+            <span class="pi pi-lock text-primary"></span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">There are no account for this product yet.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

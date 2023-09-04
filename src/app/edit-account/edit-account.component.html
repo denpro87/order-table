@@ -1,0 +1,227 @@
+<div class="card">
+  <p-toast></p-toast>
+  <p-dropdown
+    [options]="athArrData"
+    [(ngModel)]="currentAccount"
+    placeholder="Select an Account"
+    (onChange)="onAccountChange()"
+  >
+    <ng-template pTemplate="selectedItem">
+      <div *ngIf="currentAccount">
+        {{
+          currentAccount.accountName +
+            "(" +
+            currentAccount.accountId +
+            ") - " +
+            currentAccount.accountType
+        }}
+      </div>
+    </ng-template>
+    <ng-template let-account pTemplate="item">
+      <div>
+        {{
+          account.accountName +
+            "(" +
+            account.accountId +
+            ") - " +
+            account.accountType
+        }}
+      </div>
+    </ng-template>
+  </p-dropdown>
+  <div *ngIf="!loading" [@fadeInOut] class="mt-4">
+    <p-treeTable
+      #tt
+      [value]="treeTableData"
+      [columns]="selectedColumns"
+      sortMode="multiple"
+      scrollHeight="400px"
+      [reorderableColumns]="true"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      filterMode="strict"
+      [tableStyle]="{ 'min-width': '80rem' }"
+      class="edit-account-table"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center gap-2 justify-content-between">
+          <div class="">
+            <div class="text-primary text-xl font-bold">
+              Holdings ({{ holdings.length }})
+            </div>
+            <div class="font-bold flex align-items-center text-600 mt-2">
+              Unallocated Cash: <span class="text-orange-400">${{ cash }}</span>
+            </div>
+          </div>
+          <div class="flex align-items-center gap-3">
+            <app-column-filter (columnsChangeEvent)="onColumnsChange($event)" />
+            <p-button
+              label="Add Deposite / Withdraw"
+              icon="pi pi-dollar"
+              styleClass="p-button-outlined"
+            ></p-button>
+            <p-button
+              icon="pi pi-link"
+              styleClass="p-button-secondary p-button-text p-button-raised"
+            ></p-button>
+            <p-button
+              icon="pi pi-download"
+              styleClass="p-button-secondary p-button-text p-button-raised"
+              (click)="exportExcel()"
+            ></p-button>
+          </div>
+        </div>
+        <p-divider *ngIf="selectedHoldings.length"></p-divider>
+        <p-button
+          label="Delete"
+          icon="pi pi-trash"
+          styleClass="p-button-text"
+          *ngIf="selectedHoldings.length"
+          (click)="deleteAll($event)"
+        ></p-button>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th
+            *ngFor="let col of columns; let i = index"
+            [ttSortableColumn]="col.field"
+            ttReorderableColumn
+            ttResizableColumn
+            [ngStyle]="{
+              width: i === 0 ? '450px' : 'fit-content'
+            }"
+          >
+            <div class="flex align-items-center gap-2">
+              <p-checkbox
+                *ngIf="i === 0"
+                [(ngModel)]="isSelectAll"
+                [binary]="true"
+                (click)="handleSelectAll($event)"
+              ></p-checkbox>
+              <div>
+                {{ col.header }}
+                <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+              </div>
+            </div>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template
+        pTemplate="body"
+        let-rowNode
+        let-rowData="rowData"
+        let-columns="columns"
+      >
+        <tr [ngClass]="{ group: rowData.isGroup, total: rowData.isTotal }">
+          <td style="width: 450px">
+            <div class="flex align-items-center">
+              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              <p-checkbox
+                *ngIf="!rowData.isGroup && !rowData.isTotal"
+                [(ngModel)]="rowData.isSelected"
+                [binary]="true"
+                (click)="handleSelectRow($event, rowData)"
+              ></p-checkbox>
+              <div
+                class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap ml-2"
+              >
+                <div class="font-bold">
+                  {{ rowData.holdingName }}
+                </div>
+                <div *ngIf="!rowData.isTotal && !rowData.isGroup">
+                  {{ rowData.holdingType }}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span
+              class="w-full"
+              *ngIf="!rowData.isTotal && !rowData.isGroup; else quantityOutput"
+            >
+              <input
+                pInputText
+                type="number"
+                class="w-full"
+                [(ngModel)]="rowData.quantity"
+                (change)="updateHolding(rowData, 'quantity')"
+              />
+              <ng-template #quantityOutput>
+                {{ rowData.quantity }}
+              </ng-template>
+            </span>
+          </td>
+          <td>{{ rowData.price }}</td>
+          <td>
+            <span
+              class="w-full"
+              *ngIf="!rowData.isTotal && !rowData.isGroup; else percentOutput"
+            >
+              <!-- <i class="pi pi-percentage"></i> -->
+              <input
+                pInputText
+                type="number"
+                class="w-full"
+                [(ngModel)]="rowData.allocationPercent"
+                (change)="updateHolding(rowData, 'allocationPercent')"
+              />
+            </span>
+            <ng-template #percentOutput>
+              <span
+                [ngClass]="{
+                  'text-green-500':
+                    rowData.isTotal && rowData.allocationPercent === 100,
+                  'text-red-500':
+                    rowData.isTotal && rowData.allocationPercent > 100,
+                  'font-bold':
+                    rowData.isTotal && rowData.allocationPercent >= 100
+                }"
+                >{{ rowData.allocationPercent }}</span
+              >
+            </ng-template>
+          </td>
+          <td>
+            <span
+              class="w-full"
+              *ngIf="
+                !rowData.isTotal && !rowData.isGroup;
+                else allocationOutput
+              "
+            >
+              <!-- <i class="pi pi-dollar"></i> -->
+              <input
+                pInputText
+                type="number"
+                class="w-full"
+                [(ngModel)]="rowData.allocation"
+                (change)="updateHolding(rowData, 'allocation')"
+              />
+            </span>
+            <ng-template #allocationOutput>
+              {{ rowData.allocation }}
+            </ng-template>
+          </td>
+          <td>{{ rowData.minPurchase }}</td>
+          <td>
+            <div
+              class="flex align-items-center gap-2"
+              *ngIf="!rowData.isGroup && !rowData.isTotal"
+            >
+              <button
+                type="button"
+                pButton
+                pRipple
+                styleClass="p-button-sm"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger row-action-button"
+                (click)="confirmDeleteHolding($event, rowData.holdingId)"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-treeTable>
+  </div>
+  <p-confirmPopup></p-confirmPopup>
+</div>

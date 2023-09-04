@@ -1,0 +1,228 @@
+<div class="card">
+  <p-toast></p-toast>
+  <div *ngIf="!loading" [@fadeInOut]>
+    <p-treeTable
+      #tt
+      [value]="treeTableData"
+      [columns]="selectedColumns"
+      sortMode="multiple"
+      scrollHeight="400px"
+      [reorderableColumns]="true"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      filterMode="strict"
+      [tableStyle]="{ 'min-width': '80rem' }"
+      class="holding-tree-table"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex align-items-center gap-2 justify-content-between">
+          <div class="flex align-items-center gap-2">
+            <div class="flex align-items-center gap-2">
+              <label>Group by:</label>
+              <p-dropdown
+                [options]="groupingOptions"
+                [(ngModel)]="selectedGrouping"
+                optionLabel="label"
+                (onChange)="onGroupingChange()"
+              ></p-dropdown>
+            </div>
+            <p-divider layout="vertical"></p-divider>
+            <p-button
+              [label]="expandedAll ? 'Collapse all' : 'Expand all'"
+              styleClass="p-button-raised p-button-text"
+              (click)="handleExpandRows()"
+            />
+          </div>
+          <div class="flex align-items-center gap-2">
+            <app-row-filter
+              [filterOptions]="filterOptions"
+              (filterChangeEvent)="onFilterChange($event)"
+            />
+            <app-column-filter (columnsChangeEvent)="onColumnsChange($event)" />
+            <div class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                placeholder="Global Search"
+                (input)="tt.filterGlobal($event.target.value, 'contains')"
+              />
+            </div>
+            <button
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-file-excel"
+              (click)="exportExcel()"
+              class="p-button-success mr-2"
+              pTooltip="XLS"
+              tooltipPosition="bottom"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th
+            *ngFor="let col of columns; let i = index"
+            [ttSortableColumn]="col.field"
+            ttReorderableColumn
+            ttResizableColumn
+            [ngStyle]="{
+              width: i === 0 ? '450px' : 'fit-content'
+            }"
+          >
+            {{ col.header }}
+            <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+          </th>
+          <th *ngIf="isAccountView" style="width: 70px"></th>
+        </tr>
+        <!-- <tr>
+          <th *ngFor="let col of columns">
+            <input
+              *ngIf="col.filterType === 'text'"
+              pInputText
+              type="text"
+              (input)="
+                tt.filter($event.target.value, col.field, col.filterMatchMode)
+              "
+            />
+            <p-calendar
+              *ngIf="col.filterType === 'date'"
+              [touchUI]="true"
+              [readonlyInput]="true"
+              (input)="
+                tt.filter($event.target.value, col.field, col.filterMatchMode)
+              "
+            ></p-calendar>
+            <p-inputNumber
+              *ngIf="col.filterType === 'numeric'"
+              inputId="currency-us"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              (onInput)="
+                tt.filter(
+                  $event.value?.toString(),
+                  col.field,
+                  col.filterMatchMode
+                )
+              "
+            >
+            </p-inputNumber>
+          </th>
+        </tr> -->
+      </ng-template>
+      <ng-template
+        pTemplate="body"
+        let-rowNode
+        let-rowData="rowData"
+        let-columns="columns"
+      >
+        <tr *ngIf="rowData.accounts">
+          <td [attr.colspan]="selectedColumns.length">
+            <app-account-table
+              [accounts]="rowData.accounts"
+              (accountMarketValueChangeEvent)="
+                handleAccountMarketValueChange($event, rowData.holdingId)
+              "
+            />
+          </td>
+        </tr>
+        <tr
+          *ngIf="!rowData.accounts"
+          [ngClass]="{ group: rowData.isGroup, total: rowData.isTotal }"
+        >
+          <td
+            *ngFor="let col of columns; let i = index"
+            [ngStyle]="{
+              width: i === 0 ? '450px' : 'fit-content'
+            }"
+          >
+            <div class="flex align-items-center">
+              <p-treeTableToggler
+                [rowNode]="rowNode"
+                *ngIf="col.field === 'holdingName'"
+              ></p-treeTableToggler>
+              <div
+                class="overflow-hidden flex-1 text-overflow-ellipsis white-space-nowrap"
+                [ngClass]="{ 'font-bold': rowData.isTotal }"
+              >
+                <input
+                  pInputText
+                  type="number"
+                  class="w-full"
+                  [(ngModel)]="rowData[col.field]"
+                  *ngIf="
+                    rowData.isEditing &&
+                      (col.field === 'quantity' ||
+                        col.field === 'allocationPercent' ||
+                        col.field === 'allocation');
+                    else output
+                  "
+                  (change)="handleHoldingChange(rowData, col.field)"
+                />
+                <ng-template #output>
+                  {{ rowData[col.field] }}
+                </ng-template>
+              </div>
+            </div>
+          </td>
+          <td *ngIf="isAccountView">
+            <div
+              class="flex align-items-center gap-2"
+              *ngIf="!rowData.isGroup && !rowData.isTotal && !rowData.isLocked"
+            >
+              <button
+                *ngIf="!rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-pencil"
+                styleClass="p-button-sm"
+                class="p-button-rounded p-button-text row-action-button"
+                (click)="onHoldingRowEditInit(rowData)"
+              ></button>
+              <button
+                *ngIf="rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-check"
+                styleClass="p-button-sm"
+                (click)="onHoldingRowEditSave(rowData)"
+                class="p-button-rounded p-button-text p-button-success mr-2 row-action-button"
+              ></button>
+              <button
+                *ngIf="rowData.isEditing"
+                pButton
+                pRipple
+                type="button"
+                icon="pi pi-times"
+                styleClass="p-button-sm"
+                (click)="onHoldingRowEditCancel(rowData)"
+                class="p-button-rounded p-button-text p-button-danger row-action-button"
+              ></button>
+              <button
+                *ngIf="!rowData.isEditing"
+                type="button"
+                pButton
+                pRipple
+                styleClass="p-button-sm"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-danger row-action-button"
+                (click)="confirmDeleteHolding($event, rowData.holdingId)"
+              ></button>
+            </div>
+            <div
+              *ngIf="!rowData.isGroup && !rowData.isTotal && rowData.isLocked"
+            >
+              <span class="pi pi-lock text-primary"></span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-treeTable>
+  </div>
+  <p-confirmPopup></p-confirmPopup>
+</div>

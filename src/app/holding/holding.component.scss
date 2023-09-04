@@ -1,0 +1,31 @@
+:host ::ng-deep {
+  .p-progressbar {
+    height: 0.5rem;
+    background-color: #d8dadc;
+
+    .p-progressbar-value {
+      background-color: #607d8b;
+    }
+  }
+
+  .p-calendar .p-datepicker {
+    width: 400px;
+  }
+
+  .p-treetable {
+    .p-treetable-tbody {
+      > tr.group {
+        background: #fafafa;
+        color: #579cd7;
+      }
+      > tr.total {
+        background: #f2f3f3;
+      }
+    }
+    .p-button.p-button-icon-only.row-action-button {
+      width: 20px;
+      height: fit-content;
+      padding: 0;
+    }
+  }
+}

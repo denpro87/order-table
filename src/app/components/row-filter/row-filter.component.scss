@@ -1,0 +1,19 @@
+::ng-deep {
+  .p-overlaypanel {
+    .p-overlaypanel-content {
+      padding: 0;
+    }
+    .columns-filter-form {
+      .p-accordion {
+        .p-accordion-header-link {
+          border-left: none;
+          border-right: none;
+          border-radius: 0;
+        }
+        .p-accordion-content {
+          border: none;
+        }
+      }
+    }
+  }
+}
