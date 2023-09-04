@@ -1,1 +1,11 @@
-<p>equity-characteristics works!</p>
+<div>
+  <h1>Equity Characteristics</h1>
+  <p>As of {{ characteristics?.lastAnalyzed | date : "MM/dd/yyyy" }}</p>
+  <p-accordion [multiple]="true" [activeIndex]="[0]">
+    <p-accordionTab header="EQUITY STYLE">
+      <app-equity-style
+        [portfolios]="characteristics?.portfolios"
+      ></app-equity-style>
+    </p-accordionTab>
+  </p-accordion>
+</div>

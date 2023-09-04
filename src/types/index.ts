@@ -1,5 +1,6 @@
 export * from "./customer";
 export * from "./holding";
+export * from "./characteristics";
 
 export interface Column {
   field: string;

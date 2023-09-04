@@ -100,11 +100,16 @@ import { ProgressSpinnerModule } from "primeng/progressspinner";
 
 import { CustomerService } from "src/service/customerservice";
 import { HoldingService } from "src/service/holdingService";
+import { CharacteristicsService } from "src/service/characteristicsService";
+
 import { AccountTableComponent } from "./components/account-table/account-table.component";
 import { ColumnFilterComponent } from "./components/column-filter/column-filter.component";
 import { RowFilterComponent } from "./components/row-filter/row-filter.component";
-import { EditAccountComponent } from './edit-account/edit-account.component';
-import { EquityCharacteristicsComponent } from './equity-characteristics/equity-characteristics.component';
+import { EditAccountComponent } from "./edit-account/edit-account.component";
+import { EquityCharacteristicsComponent } from "./equity-characteristics/equity-characteristics.component";
+import { EquityStyleComponent } from './components/equity-characteristics/equity-style/equity-style.component';
+import { EquityStyleTableComponent } from './components/equity-characteristics/equity-style-table/equity-style-table.component';
+import { EquityStyleBoxComponent } from './components/equity-characteristics/equity-style-box/equity-style-box.component';
 
 @NgModule({
   imports: [
@@ -212,8 +217,11 @@ import { EquityCharacteristicsComponent } from './equity-characteristics/equity-
     RowFilterComponent,
     EditAccountComponent,
     EquityCharacteristicsComponent,
+    EquityStyleComponent,
+    EquityStyleTableComponent,
+    EquityStyleBoxComponent,
   ],
   bootstrap: [AppComponent],
-  providers: [CustomerService, HoldingService],
+  providers: [CustomerService, HoldingService, CharacteristicsService],
 })
 export class AppModule {}
